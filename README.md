@@ -1,15 +1,26 @@
-# CrownBoard V1.1
+# CrownBoard V1.1 — Polished Test Build
 
-First onboarding revision.
+Upload all files to the root of the existing CrownBoard GitHub repository and replace the existing files.
 
-Changes from V1.0:
-- Historical completed-season entry is now part of profile creation.
-- Starts with Chapter 7 Season 1, 2, and 3 rows; add/remove seasons as needed.
-- Current season is explicitly stored as a baseline and does not create a weekly period.
-- Completed seasons calculate Crown Score automatically.
-- Profile data history displays historical seasons and qualification status.
-- Season Trend compares the current season against the latest completed season.
-- Added validation for wins > matches.
-- Service worker cache bumped so the updated shell refreshes correctly.
+This build preserves the existing `crownboard-v1` local-storage key, so your current Test Player should remain after the update.
 
-Upload these files to the repository root and replace the existing files.
+Implemented in this V1.1 batch:
+- Actual current-season name on Home
+- Lifetime Crown Score on Home
+- Tappable Crown Score with transparent 50/25/25 breakdown
+- Cleaner three-metric performance strip
+- Same-player comparison handling and different-player defaults
+- All 11 planned record categories
+- Editable historical seasons
+- Edit Player, profile photo, selectable accent, and Delete Player
+- Compressed profile photos
+- Consistent custom SVG bottom navigation icons
+- Compact header after scrolling
+- Richer Highlights with screenshot, placement, eliminations, damage, other stats, caption
+- Data & Backup section
+- JSON export/import
+- IndexedDB mirror in addition to localStorage
+- USA benchmark remains deliberately unavailable until defensible data exists
+- Service-worker cache bump/cleanup for reliable GitHub Pages refresh
+
+Keep using the fake profile until the test pass is complete.
