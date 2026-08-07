@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.webmanifest">
-<title>CrownBoard V1.1.2</title>
+<title>CrownBoard V1.1.3</title>
 <style>
 :root{
   --bg:#07111f;--card:#0e1b2e;--line:#243550;--text:#f6f8fb;--muted:#99a8bf;
@@ -163,7 +163,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
   <div class="section card">
     <div class="sectionHead"><h2>Data & Backup</h2></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
-  </div>
+  </div><div class="section card"><div class="sectionHead"><h2>App Info</h2><span class="pill" id="appUpdatePill">Checking…</span></div><div class="appInfoGrid"><div class="appInfoItem"><div class="label">Installed Version</div><div class="appInfoValue" id="installedVersion">—</div></div><div class="appInfoItem"><div class="label">Latest Version</div><div class="appInfoValue" id="latestVersion">—</div></div><div class="appInfoItem"><div class="label">Last App Update</div><div class="appInfoValue" id="lastAppUpdate">—</div></div><div class="appInfoItem"><div class="label">Status</div><div class="appInfoValue" id="appUpdateStatus">—</div></div></div><div class="appInfoActions"><button class="btn" id="checkUpdateBtn">Check for Update</button><button class="btn" id="reloadAppBtn">Reload App</button><button class="btn primary" id="forceRefreshBtn">Force Refresh</button></div><div class="appInfoFoot">CrownBoard · Zero Build Performance Tracker</div></div>
 </section>
 </main>
 </div>
@@ -214,7 +214,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
 </div></div>
 
 <script>
-const APP_VERSION='1.1.2', DB_KEY='crownboard-v1';
+const APP_VERSION='1.1.3', DB_KEY='crownboard-v1';
 let db={activeProfileId:null,profiles:[]}, trendMetric='score', editingProfileId=null, editingHighlightIndex=null, pendingPhoto='', pendingHighlightImage='';
 const $=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n)), fmt1=n=>Number.isFinite(n)?n.toFixed(1):'—';
 
@@ -355,6 +355,13 @@ function deleteHighlight(){
 function exportJson(){const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='CrownBoard-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function importJsonFile(f){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.profiles))throw 0;if(!confirm('Replace local CrownBoard data with this backup?'))return;db=x;save();render()}catch(e){alert('Invalid CrownBoard backup')}};r.readAsText(f)}
 
+const APP_UPDATED='2026-08-07';
+function vparts(v){return String(v||'0').split('.').map(n=>parseInt(n)||0)}
+function vcmp(a,b){const A=vparts(a),B=vparts(b);for(let i=0;i<Math.max(A.length,B.length);i++){if((A[i]||0)>(B[i]||0))return 1;if((A[i]||0)<(B[i]||0))return -1}return 0}
+function updateInfo(latest=APP_VERSION,updated=APP_UPDATED,failed=false){$('installedVersion').textContent=APP_VERSION;$('latestVersion').textContent=latest||'—';$('lastAppUpdate').textContent=updated?new Date(updated+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—';const c=vcmp(latest,APP_VERSION),st=failed?'Could not check':c>0?'Update available':c<0?'Preview build':'Up to date';$('appUpdateStatus').textContent=st;$('appUpdatePill').textContent=st;$('forceRefreshBtn').textContent=c>0?'Update App':'Force Refresh'}
+async function checkForUpdate(){try{const r=await fetch('./version.json?cb='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const x=await r.json();updateInfo(x.version,x.updated)}catch(e){updateInfo(APP_VERSION,APP_UPDATED,true)}}
+async function forceRefresh(){try{if('serviceWorker'in navigator){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}if('caches'in window){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}}catch(e){}const u=new URL(location.href);u.searchParams.set('refresh',Date.now());location.replace(u)}
+
 document.querySelectorAll('.navBtn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===b.dataset.view));document.querySelectorAll('.navBtn').forEach(x=>x.classList.toggle('active',x===b));render()});
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
 document.querySelectorAll('[data-record-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-record-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');['records','goals','highlights'].forEach(k=>$(k+'Pane').style.display=k===b.dataset.recordTab?'block':'none')});
@@ -364,11 +371,11 @@ $('addProfileBtn').onclick=()=>openProfileModal(false);$('editProfileBtn').oncli
 $('choosePhotoBtn').onclick=()=>$('newPhoto').click();$('newPhoto').onchange=async e=>{if(e.target.files[0]){pendingPhoto=await compressImage(e.target.files[0],360,.78);$('newPhotoPreview').src=pendingPhoto}};
 $('newAccent').oninput=e=>{if(!pendingPhoto)$('newPhotoPreview').src=avatarData($('newName').value||'NEW',e.target.value)};
 $('newName').oninput=e=>{if(!pendingPhoto)$('newPhotoPreview').src=avatarData(e.target.value||'NEW',$('newAccent').value)};
-$('saveHighlightBtn').onclick=saveHighlight;$('deleteHighlightBtn').onclick=deleteHighlight;$('exportBtn').onclick=exportJson;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>e.target.files[0]&&importJsonFile(e.target.files[0]);
+$('saveHighlightBtn').onclick=saveHighlight;$('deleteHighlightBtn').onclick=deleteHighlight;$('exportBtn').onclick=exportJson;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>e.target.files[0]&&importJsonFile(e.target.files[0]);$('checkUpdateBtn').onclick=checkForUpdate;$('reloadAppBtn').onclick=()=>location.reload();$('forceRefreshBtn').onclick=forceRefresh;
 $('compareA').onchange=()=>{renderProfileSelects();renderCompare()};$('compareB').onchange=()=>{renderProfileSelects();renderCompare()};
 $('profileSwitch').onclick=()=>{if(db.profiles.length<2)return;const i=db.profiles.findIndex(p=>p.id===db.activeProfileId),n=db.profiles[(i+1)%db.profiles.length];db.activeProfileId=n.id;save();render()};
 window.addEventListener('scroll',()=>{$('appHeader').classList.toggle('compact',window.scrollY>70)},{passive:true});
-load();render();
+load();updateInfo();checkForUpdate();render();
 </script>
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}</script>
 </body>
