@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.webmanifest">
-<title>CrownBoard V1.1</title>
+<title>CrownBoard V1.1.1</title>
 <style>
 :root{
   --bg:#07111f;--card:#0e1b2e;--line:#243550;--text:#f6f8fb;--muted:#99a8bf;
@@ -98,7 +98,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
     <div class="card scoreCard">
       <button class="scoreButton" id="scoreBreakdownBtn" aria-label="View Crown Score breakdown">
         <div class="scoreRing" id="scoreRing" style="--score:0"><div class="scoreInner">
-          <div class="crown">♛</div><div class="score" id="homeScore">—</div><div class="tier" id="homeTier">—</div><div class="subtle">CROWN SCORE · TAP FOR DETAILS</div>
+          <div class="crown">♛</div><div class="score" id="homeScore">—</div><div class="tier" id="homeTier">—</div>
         </div></div>
       </button>
       <div style="margin-top:12px"><span class="pill">Lifetime <b id="lifetimeScore" style="margin-left:6px;color:white">—</b></span></div>
@@ -162,7 +162,6 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
   </div>
   <div class="section card">
     <div class="sectionHead"><h2>Data & Backup</h2></div>
-    <p class="subtle">Export a human-readable backup before major changes. Import replaces the local CrownBoard database.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
   </div>
 </section>
@@ -202,7 +201,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
 </div></div>
 
 <div class="modal" id="highlightModal"><div class="sheet">
-  <div class="sectionHead"><h2>Add Highlight</h2><button class="btn" data-close="highlightModal">Close</button></div>
+  <div class="sectionHead"><h2 id="highlightModalTitle">Add Highlight</h2><button class="btn" data-close="highlightModal">Close</button></div>
   <div class="formGrid">
     <div class="field"><label>Screenshot</label><input id="hlImage" type="file" accept="image/*"></div>
     <div class="grid2"><div class="field"><label>Date</label><input id="hlDate" type="date"></div><div class="field"><label>Placement</label><input id="hlPlacement" inputmode="numeric" value="1"></div></div>
@@ -210,12 +209,13 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
     <div class="field"><label>Other visible stats</label><textarea id="hlOther" rows="3" placeholder="Accuracy, headshots, assists, etc."></textarea></div>
     <div class="field"><label>Caption</label><input id="hlCaption" placeholder="Monster game"></div>
     <button class="btn primary" id="saveHighlightBtn">SAVE HIGHLIGHT</button>
+    <button class="btn danger" id="deleteHighlightBtn" style="display:none">DELETE HIGHLIGHT</button>
   </div>
 </div></div>
 
 <script>
-const APP_VERSION='1.1', DB_KEY='crownboard-v1';
-let db={activeProfileId:null,profiles:[]}, trendMetric='score', editingProfileId=null, pendingPhoto='';
+const APP_VERSION='1.1.1', DB_KEY='crownboard-v1';
+let db={activeProfileId:null,profiles:[]}, trendMetric='score', editingProfileId=null, editingHighlightIndex=null, pendingPhoto='', pendingHighlightImage='';
 const $=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n)), fmt1=n=>Number.isFinite(n)?n.toFixed(1):'—';
 
 function save(){localStorage.setItem(DB_KEY,JSON.stringify(db)); idbMirror().catch(()=>{})}
@@ -230,7 +230,22 @@ function qual(m,t='period'){return t==='season'?(m<50?'Informational':m<100?'Pro
 function periods(p){const s=[...(p.snapshots||[])].sort((a,b)=>new Date(a.date)-new Date(b.date)),o=[];for(let i=1;i<s.length;i++){const d={matches:s[i].matches-s[i-1].matches,wins:s[i].wins-s[i-1].wins,elims:s[i].elims-s[i-1].elims};if(d.matches<0||d.wins<0||d.elims<0)continue;const st=stats(d);o.push({from:s[i-1].date,to:s[i].date,...st,score:crown(st).score,qualification:qual(st.matches)})}return o}
 function seasonStats(p){const s=(p.snapshots||[]).at(-1)||{matches:0,wins:0,elims:0},st=stats(s);return{...st,...crown(st)}}
 function lifetimeStats(p){const h=(p.history||[]).reduce((a,x)=>({matches:a.matches+(+x.matches||0),wins:a.wins+(+x.wins||0),elims:a.elims+(+x.elims||0)}),{matches:0,wins:0,elims:0}),c=(p.snapshots||[]).at(-1)||{matches:0,wins:0,elims:0},st=stats({matches:h.matches+(+c.matches||0),wins:h.wins+(+c.wins||0),elims:h.elims+(+c.elims||0)});return{...st,...crown(st)}}
-function recentForm(p){const q=periods(p).filter(x=>x.qualification==='Official');if(q.length<2)return{label:'NO TREND YET',text:'Add qualifying snapshots to build a trend.'};const r=q.slice(-4),v=q.slice(-8,-4),avg=a=>a.reduce((x,y)=>x+y,0)/a.length;if(!v.length){const a=q.at(-1),b=q.at(-2),d=a.score-b.score;return{label:d>3?'IMPROVING':d<-3?'COOLING OFF':'STABLE',text:`Latest Crown Score ${d>=0?'+':''}${fmt1(d)} vs previous qualifying period.`}}const rr={wr:avg(r.map(x=>x.wr)),eg:avg(r.map(x=>x.eg)),kd:avg(r.map(x=>x.kd))},vv={wr:avg(v.map(x=>x.wr)),eg:avg(v.map(x=>x.eg)),kd:avg(v.map(x=>x.kd))};const diff=(rr.wr-vv.wr)*.5+(rr.eg-vv.eg)*4+(rr.kd-vv.kd)*2,label=diff>5?'STRONGLY IMPROVING':diff>1.5?'IMPROVING':diff<-5?'DECLINING':diff<-1.5?'COOLING OFF':'STABLE';const movers=[['Win rate',rr.wr-vv.wr],['Elimination efficiency',rr.eg-vv.eg],['K/D',rr.kd-vv.kd]].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));return{label,text:`${movers[0][0]} is the biggest recent mover (${movers[0][1]>=0?'+':''}${fmt1(movers[0][1])}).`}}
+function recentForm(p){
+ const ps=periods(p);
+ if(!ps.length)return{label:'NO TREND YET',text:''};
+ const q=ps.filter(x=>x.qualification==='Official');
+ const usable=q.length?q:ps;
+ if(usable.length===1){
+   const x=usable[0],base=(p.snapshots||[])[0],bs=stats(base||{matches:0,wins:0,elims:0}),bc=crown(bs).score,d=x.score-bc;
+   return{label:d>3?'IMPROVING':d<-3?'COOLING OFF':'STABLE',text:`Crown Score ${d>=0?'+':''}${fmt1(d)} since baseline.`}
+ }
+ const r=usable.slice(-4),v=usable.slice(-8,-4),avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+ if(!v.length){const a=usable.at(-1),b=usable.at(-2),d=a.score-b.score;return{label:d>3?'IMPROVING':d<-3?'COOLING OFF':'STABLE',text:`Crown Score ${d>=0?'+':''}${fmt1(d)} vs previous update.`}}
+ const rr={wr:avg(r.map(x=>x.wr)),eg:avg(r.map(x=>x.eg)),kd:avg(r.map(x=>x.kd))},vv={wr:avg(v.map(x=>x.wr)),eg:avg(v.map(x=>x.eg)),kd:avg(v.map(x=>x.kd))};
+ const diff=(rr.wr-vv.wr)*.5+(rr.eg-vv.eg)*4+(rr.kd-vv.kd)*2,label=diff>5?'STRONGLY IMPROVING':diff>1.5?'IMPROVING':diff<-5?'DECLINING':diff<-1.5?'COOLING OFF':'STABLE';
+ const movers=[['Win rate',rr.wr-vv.wr],['Elimination efficiency',rr.eg-vv.eg],['K/D',rr.kd-vv.kd]].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+ return{label,text:`${movers[0][0]} ${movers[0][1]>=0?'+':''}${fmt1(movers[0][1])}.`}
+}
 function avatarData(name,accent){const x=(name||'?').split(/\s+/).map(v=>v[0]).join('').slice(0,2).toUpperCase();return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="160" height="160" rx="80" fill="#13253a"/><circle cx="80" cy="80" r="72" fill="none" stroke="${accent}" stroke-width="8"/><text x="80" y="96" text-anchor="middle" font-family="Arial" font-size="58" fill="white">${x}</text></svg>`)}`}
 function compressImage(file,maxW=700,quality=.78){return new Promise((resolve,reject)=>{const img=new Image(),r=new FileReader();r.onload=()=>img.src=r.result;r.onerror=reject;img.onload=()=>{const scale=Math.min(1,maxW/img.width),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',quality))};r.readAsDataURL(file)})}
 
@@ -251,15 +266,40 @@ function render(){
 function renderScoreBreakdown(p){const s=seasonStats(p),c=crown(s);$('breakdownScore').textContent=fmt1(c.score);$('breakdownTier').textContent=tier(c.score);const rows=[['Win Rate',`${fmt1(s.wr)}%`,c.components.wr,50],['Elims / Game',fmt1(s.eg),c.components.eg,25],['K/D',fmt1(s.kd),c.components.kd,25]];$('scoreBreakdownRows').innerHTML=rows.map(([n,v,pts,max])=>`<div class="breakdownRow"><div><b>${n}</b><div class="subtle small">${v}</div><div class="breakdownBar"><i style="width:${pts/max*100}%"></i></div></div><b>${fmt1(pts)} / ${max}</b></div>`).join('')+`<div class="breakdownRow"><b>Total</b><b>${fmt1(c.score)} / 100</b></div>`}
 function renderGoals(p){const g=p.goals||[];$('homeGoals').innerHTML=g.slice(0,3).map(x=>`<div class="listItem"><span>${x.label}</span><b>${x.target}</b></div>`).join('')||'<div class="subtle">No goals yet.</div>';$('goalsPane').innerHTML=`<div class="sectionHead"><h2>Goals</h2><button class="btn small" onclick="addGoal()">+ Goal</button></div>`+(g.map(x=>`<div class="record"><span>${x.label}</span><b>${x.target}</b></div>`).join('')||'<div class="subtle">Create your first goal.</div>')}
 function addGoal(){const p=profile(),l=prompt('Goal name');if(!l)return;const t=prompt('Target');(p.goals||(p.goals=[])).push({label:l,target:t});save();render()}
-function renderTrends(p){const m=[['score','Crown Score'],['wr','Win Rate'],['eg','E/G'],['kd','K/D'],['wins','Wins'],['elims','Eliminations']];$('trendMetricTabs').innerHTML=m.map(([k,l])=>`<button class="tabBtn ${trendMetric===k?'active':''}" onclick="trendMetric='${k}';renderTrends(profile())">${l}</button>`).join('');const pt=periods(p),v=pt.map(x=>x[trendMetric]),svg=$('trendSvg');if(v.length<2){svg.innerHTML='<text x="300" y="120" text-anchor="middle" fill="#8ea0b8">Add more snapshots to build your trend.</text>';return}const mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1,xy=v.map((n,i)=>[22+i*(556/(v.length-1)),204-((n-mn)/r)*165]);svg.innerHTML=`<polyline fill="none" stroke="var(--accent)" stroke-width="4" points="${xy.map(p=>p.join(',')).join(' ')}"/>`+xy.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="6" fill="var(--accent)"><title>${pt[i].to}: ${fmt1(v[i])}</title></circle>`).join('')}
+function renderTrends(p){
+ const m=[['score','Crown Score'],['wr','Win Rate'],['eg','E/G'],['kd','K/D'],['wins','Wins'],['elims','Eliminations']];
+ $('trendMetricTabs').innerHTML=m.map(([k,l])=>`<button class="tabBtn ${trendMetric===k?'active':''}" onclick="trendMetric='${k}';renderTrends(profile())">${l}</button>`).join('');
+ const pt=periods(p),v=pt.map(x=>x[trendMetric]),svg=$('trendSvg');
+ if(!v.length){svg.innerHTML='<text x="300" y="120" text-anchor="middle" fill="#8ea0b8">No weekly updates yet.</text>';return}
+ if(v.length===1){
+   const y=120;
+   svg.innerHTML=`<circle cx="300" cy="${y}" r="7" fill="var(--accent)"><title>${pt[0].to}: ${fmt1(v[0])}</title></circle><text x="300" y="154" text-anchor="middle" fill="#8ea0b8">${fmt1(v[0])}</text>`;
+   return
+ }
+ const mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1,xy=v.map((n,i)=>[22+i*(556/(v.length-1)),204-((n-mn)/r)*165]);
+ svg.innerHTML=`<polyline fill="none" stroke="var(--accent)" stroke-width="4" points="${xy.map(p=>p.join(',')).join(' ')}"/>`+xy.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="6" fill="var(--accent)"><title>${pt[i].to}: ${fmt1(v[i])}</title></circle>`).join('')
+}
 function renderProfileSelects(){const opts=db.profiles.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''),a=$('compareA').value,b=$('compareB').value;$('compareA').innerHTML=opts;$('compareB').innerHTML=opts;$('compareA').value=a&&db.profiles.some(p=>p.id===a)?a:(db.profiles[0]?.id||'');const defaultB=db.profiles.find(p=>p.id!==$('compareA').value)?.id||$('compareA').value;$('compareB').value=b&&db.profiles.some(p=>p.id===b)?b:defaultB}
 function renderCompare(){const a=db.profiles.find(p=>p.id===$('compareA').value)||db.profiles[0],b=db.profiles.find(p=>p.id===$('compareB').value)||db.profiles.find(p=>p.id!==a?.id)||a;if(!a||!b)return;const sa=seasonStats(a),sb=seasonStats(b),same=a.id===b.id,tie=Math.abs(sa.score-sb.score)<.05;let headline='TIE';if(!same&&!tie)headline=(sa.score>sb.score?a:b).name.toUpperCase()+' TAKES IT';$('compareCard').innerHTML=`<div class="compareHero"><div class="compareSide"><div class="small">${a.name}</div><div class="compareScore">${fmt1(sa.score)}</div></div><div>VS</div><div class="compareSide"><div class="small">${b.name}</div><div class="compareScore">${fmt1(sb.score)}</div></div></div><hr style="border-color:var(--line)"><div class="grid3"><div class="metric"><div class="label">Win Rate</div><div class="value">${fmt1(sa.wr)} / ${fmt1(sb.wr)}</div></div><div class="metric"><div class="label">E/G</div><div class="value">${fmt1(sa.eg)} / ${fmt1(sb.eg)}</div></div><div class="metric"><div class="label">K/D</div><div class="value">${fmt1(sa.kd)} / ${fmt1(sb.kd)}</div></div></div><h2 class="gold" style="margin-top:16px">${same?'SELECT TWO DIFFERENT PLAYERS':headline}</h2><p class="subtle">${same?'Add another profile or choose a different player.':'Winning carries the most weight in Crown Score.'}</p>`}
 function bestRecord(q,key,mode='max'){if(!q.length)return null;return mode==='max'?Math.max(...q.map(x=>x[key])):Math.min(...q.map(x=>x[key]))}
 function renderRecords(p){const q=periods(p).filter(x=>x.qualification==='Official'),hist=(p.history||[]).filter(x=>qual(+x.matches,'season')==='Official').map(x=>{const s=stats(x);return{...x,...s,score:crown(s).score}});let bestImp=null;if(q.length>1)bestImp=Math.max(...q.slice(1).map((x,i)=>x.score-q[i].score));let streak=0,maxStreak=0;for(let i=1;i<q.length;i++){if(q[i].score>q[i-1].score){streak++;maxStreak=Math.max(maxStreak,streak)}else streak=0}
  const rows=[['Highest Weekly Crown Score',bestRecord(q,'score'),x=>fmt1(x)],['Highest Weekly Win Rate',bestRecord(q,'wr'),x=>fmt1(x)+'%'],['Most Weekly Wins',bestRecord(q,'wins'),x=>x],['Highest Weekly K/D',bestRecord(q,'kd'),x=>fmt1(x)],['Most Weekly Eliminations',bestRecord(q,'elims'),x=>x],['Highest Weekly Elims/Game',bestRecord(q,'eg'),x=>fmt1(x)],['Best Improvement Week',bestImp,x=>(x>=0?'+':'')+fmt1(x)],['Highest Season Crown Score',bestRecord(hist,'score'),x=>fmt1(x)],['Highest Season Win Rate',bestRecord(hist,'wr'),x=>fmt1(x)+'%'],['Highest Season K/D',bestRecord(hist,'kd'),x=>fmt1(x)],['Longest Improving Streak',q.length?maxStreak:null,x=>x+' periods']];
  $('recordsPane').innerHTML=rows.map(([l,v,f])=>`<div class="record"><span>${l}</span><b>${v==null||!Number.isFinite(v)?'—':f(v)}</b></div>`).join('');
- const h=p.highlights||[];$('highlightsPane').innerHTML=`<div class="sectionHead"><h2>Highlights</h2><button class="btn small" id="addHighlightBtn">+ Highlight</button></div><div class="list">${h.length?h.map((x,i)=>`<button class="highlightCard" onclick="viewHighlight(${i})" style="color:inherit;text-align:left"><img src="${x.image||avatarData('HL',p.accent)}"><div><b>${x.caption||`${x.elims||0} Elim Highlight`}</b><div class="subtle small">${x.date||''} · ${x.placement||'?'} place · ${x.elims||0} elims${x.damage?` · ${x.damage} damage`:''}</div></div></button>`).join(''):'<div class="subtle">No monster games logged yet.</div>'}</div>`;setTimeout(()=>{const b=$('addHighlightBtn');if(b)b.onclick=openHighlightModal},0)}
-function viewHighlight(i){const h=profile().highlights[i];if(!h)return;const txt=[`${h.date||''} · ${h.placement||'?'} place · ${h.elims||0} eliminations`,h.damage&&`${h.damage} damage`,h.other,h.caption].filter(Boolean).join('\n');alert(txt)}
+ const h=p.highlights||[];$('highlightsPane').innerHTML=`<div class="sectionHead"><h2>Highlights</h2><button class="btn small" id="addHighlightBtn">+ Highlight</button></div><div class="list">${h.length?h.map((x,i)=>`<button class="highlightCard" onclick="editHighlight(${i})" style="color:inherit;text-align:left"><img src="${x.image||avatarData('HL',p.accent)}"><div><b>${x.caption||`${x.elims||0} Elim Highlight`}</b><div class="subtle small">${x.date||''} · ${x.placement||'?'} place · ${x.elims||0} elims${x.damage?` · ${x.damage} damage`:''}</div></div></button>`).join(''):'<div class="subtle">No monster games logged yet.</div>'}</div>`;setTimeout(()=>{const b=$('addHighlightBtn');if(b)b.onclick=openHighlightModal},0)}
+function editHighlight(i){
+ const p=profile(),h=(p.highlights||[])[i];if(!h)return;
+ editingHighlightIndex=i;pendingHighlightImage=h.image||'';
+ $('highlightModalTitle').textContent='Edit Highlight';
+ $('deleteHighlightBtn').style.display='block';
+ $('hlDate').value=h.date||'';
+ $('hlPlacement').value=h.placement||1;
+ $('hlElims').value=h.elims??'';
+ $('hlDamage').value=h.damage??'';
+ $('hlOther').value=h.other||'';
+ $('hlCaption').value=h.caption||'';
+ $('hlImage').value='';
+ $('highlightModal').classList.add('open')
+}
 function renderHistory(p){const seasons=(p.history||[]).map((h,i)=>{const s=stats(h),c=crown(s).score;return `<div class="listItem"><span><b>${h.season}</b><br><span class="small subtle">${h.matches} matches · ${h.wins} wins · ${h.elims} elims · Crown ${fmt1(c)}</span></span><div style="display:grid;gap:6px;justify-items:end"><span class="pill">${qual(h.matches,'season')}</span><button class="btn small" onclick="editHistorical(${i})">Edit</button></div></div>`}).join('');const snaps=(p.snapshots||[]).slice().reverse().map((s,i)=>`<div class="listItem"><span>${s.date}${s.baseline?' · Baseline':''}<br><span class="small subtle">${s.matches} matches · ${s.wins} wins · ${s.elims} elims</span></span><button class="btn small" onclick="editSnapshot(${p.snapshots.length-1-i})">Edit</button></div>`).join('');$('dataHistory').innerHTML=seasons+snaps||'<div class="subtle">No data yet.</div>'}
 function editHistorical(i){const p=profile(),h=p.history[i],m=+prompt(`${h.season} matches`,h.matches),w=+prompt(`${h.season} wins`,h.wins),e=+prompt(`${h.season} eliminations`,h.elims);if([m,w,e].some(Number.isNaN)||m<0||w<0||e<0||w>m)return alert('Check those totals.');Object.assign(h,{matches:m,wins:w,elims:e});save();render()}
 function editSnapshot(i){const p=profile(),s=p.snapshots[i],m=+prompt('Matches',s.matches),w=+prompt('Wins',s.wins),e=+prompt('Eliminations',s.elims);if([m,w,e].some(Number.isNaN)||m<0||w<0||e<0||w>m)return alert('Check those totals.');const prev=p.snapshots[i-1],next=p.snapshots[i+1];if(prev&&(m<prev.matches||w<prev.wins||e<prev.elims))return alert('This snapshot cannot be lower than the previous snapshot.');if(next&&(m>next.matches||w>next.wins||e>next.elims))return alert('This snapshot cannot exceed the next snapshot.');Object.assign(s,{matches:m,wins:w,elims:e});save();render()}
@@ -271,8 +311,25 @@ function resetProfileForm(){editingProfileId=null;pendingPhoto='';$('profileModa
 function openProfileModal(edit=false){if(edit&&profile()){const p=profile();editingProfileId=p.id;pendingPhoto=p.photo||'';$('profileModalTitle').textContent='Edit Player';$('deleteProfileBtn').style.display='block';$('newName').value=p.name||'';$('newEpic').value=p.epic||'';$('newAccent').value=p.accent||'#15d8ff';$('newFirstSeason').value=p.firstSeason||'';$('newCurrentSeason').value=p.currentSeason||'';const cur=(p.snapshots||[]).at(-1)||{matches:0,wins:0,elims:0};$('newMatches').value=cur.matches;$('newWins').value=cur.wins;$('newElims').value=cur.elims;$('historySeasonRows').innerHTML='';(p.history||[]).forEach(historyRow);$('newPhotoPreview').src=p.photo||avatarData(p.name,p.accent)}else resetProfileForm();$('profileModal').classList.add('open')}
 function saveProfile(){const n=$('newName').value.trim();if(!n)return alert('Name required');const history=collectHistory();for(const h of history)if(h.wins>h.matches||h.matches<0||h.wins<0||h.elims<0)return alert(`${h.season}: check the totals.`);const cm=+$('newMatches').value||0,cw=+$('newWins').value||0,ce=+$('newElims').value||0;if(cw>cm)return alert('Current wins cannot exceed matches.');if(editingProfileId){const p=db.profiles.find(x=>x.id===editingProfileId);Object.assign(p,{name:n,epic:$('newEpic').value.trim(),accent:$('newAccent').value,firstSeason:$('newFirstSeason').value.trim(),currentSeason:$('newCurrentSeason').value.trim(),photo:pendingPhoto,history});const last=(p.snapshots||[]).at(-1);if(last&&last.baseline){Object.assign(last,{matches:cm,wins:cw,elims:ce})}}else{const id='p-'+Date.now(),p={id,name:n,epic:$('newEpic').value.trim(),accent:$('newAccent').value||'#15d8ff',firstSeason:$('newFirstSeason').value.trim(),currentSeason:$('newCurrentSeason').value||'Current Season',photo:pendingPhoto,history,snapshots:[{date:new Date().toISOString().slice(0,10),matches:cm,wins:cw,elims:ce,baseline:true}],goals:[],highlights:[]};db.profiles.push(p);db.activeProfileId=id}save();$('profileModal').classList.remove('open');render()}
 function deleteProfile(){const p=profile();if(!p)return;if(!confirm(`Delete ${p.name} and all of this player's CrownBoard data?`))return;db.profiles=db.profiles.filter(x=>x.id!==p.id);db.activeProfileId=db.profiles[0]?.id||null;save();$('profileModal').classList.remove('open');render()}
-function openHighlightModal(){$('hlDate').value=new Date().toISOString().slice(0,10);$('hlPlacement').value=1;$('hlElims').value='';$('hlDamage').value='';$('hlOther').value='';$('hlCaption').value='';$('hlImage').value='';$('highlightModal').classList.add('open')}
-async function saveHighlight(){const p=profile(),f=$('hlImage').files[0],image=f?await compressImage(f,1100,.72):'';(p.highlights||(p.highlights=[])).push({image,date:$('hlDate').value,placement:$('hlPlacement').value,elims:+$('hlElims').value||0,damage:+$('hlDamage').value||0,other:$('hlOther').value.trim(),caption:$('hlCaption').value.trim()});save();$('highlightModal').classList.remove('open');render()}
+function openHighlightModal(){
+ editingHighlightIndex=null;pendingHighlightImage='';
+ $('highlightModalTitle').textContent='Add Highlight';
+ $('deleteHighlightBtn').style.display='none';
+ $('hlDate').value=new Date().toISOString().slice(0,10);$('hlPlacement').value=1;$('hlElims').value='';$('hlDamage').value='';$('hlOther').value='';$('hlCaption').value='';$('hlImage').value='';
+ $('highlightModal').classList.add('open')
+}
+async function saveHighlight(){
+ const p=profile(),f=$('hlImage').files[0],image=f?await compressImage(f,1100,.72):pendingHighlightImage;
+ const item={image,date:$('hlDate').value,placement:$('hlPlacement').value,elims:+$('hlElims').value||0,damage:+$('hlDamage').value||0,other:$('hlOther').value.trim(),caption:$('hlCaption').value.trim()};
+ p.highlights||(p.highlights=[]);
+ if(editingHighlightIndex===null)p.highlights.push(item);else p.highlights[editingHighlightIndex]=item;
+ save();$('highlightModal').classList.remove('open');editingHighlightIndex=null;pendingHighlightImage='';render()
+}
+function deleteHighlight(){
+ const p=profile();if(editingHighlightIndex===null||!p?.highlights?.[editingHighlightIndex])return;
+ if(!confirm('Delete this highlight?'))return;
+ p.highlights.splice(editingHighlightIndex,1);save();$('highlightModal').classList.remove('open');editingHighlightIndex=null;pendingHighlightImage='';render()
+}
 function exportJson(){const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='CrownBoard-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function importJsonFile(f){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.profiles))throw 0;if(!confirm('Replace local CrownBoard data with this backup?'))return;db=x;save();render()}catch(e){alert('Invalid CrownBoard backup')}};r.readAsText(f)}
 
@@ -285,7 +342,7 @@ $('addProfileBtn').onclick=()=>openProfileModal(false);$('editProfileBtn').oncli
 $('choosePhotoBtn').onclick=()=>$('newPhoto').click();$('newPhoto').onchange=async e=>{if(e.target.files[0]){pendingPhoto=await compressImage(e.target.files[0],360,.78);$('newPhotoPreview').src=pendingPhoto}};
 $('newAccent').oninput=e=>{if(!pendingPhoto)$('newPhotoPreview').src=avatarData($('newName').value||'NEW',e.target.value)};
 $('newName').oninput=e=>{if(!pendingPhoto)$('newPhotoPreview').src=avatarData(e.target.value||'NEW',$('newAccent').value)};
-$('saveHighlightBtn').onclick=saveHighlight;$('exportBtn').onclick=exportJson;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>e.target.files[0]&&importJsonFile(e.target.files[0]);
+$('saveHighlightBtn').onclick=saveHighlight;$('deleteHighlightBtn').onclick=deleteHighlight;$('exportBtn').onclick=exportJson;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>e.target.files[0]&&importJsonFile(e.target.files[0]);
 $('compareA').onchange=()=>{if($('compareA').value===$('compareB').value&&db.profiles.length>1)$('compareB').value=db.profiles.find(p=>p.id!==$('compareA').value).id;renderCompare()};$('compareB').onchange=renderCompare;
 $('profileSwitch').onclick=()=>{if(db.profiles.length<2)return;const i=db.profiles.findIndex(p=>p.id===db.activeProfileId),n=db.profiles[(i+1)%db.profiles.length];db.activeProfileId=n.id;save();render()};
 window.addEventListener('scroll',()=>{$('appHeader').classList.toggle('compact',window.scrollY>70)},{passive:true});

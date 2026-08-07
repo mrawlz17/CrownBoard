@@ -1,26 +1,16 @@
-# CrownBoard V1.1 — Polished Test Build
+# CrownBoard V1.1.1
 
-Upload all files to the root of the existing CrownBoard GitHub repository and replace the existing files.
+Upload all files in this folder to the root of the existing CrownBoard GitHub repository and replace the existing files.
 
-This build preserves the existing `crownboard-v1` local-storage key, so your current Test Player should remain after the update.
+This release preserves the existing `crownboard-v1` local-storage key.
 
-Implemented in this V1.1 batch:
-- Actual current-season name on Home
-- Lifetime Crown Score on Home
-- Tappable Crown Score with transparent 50/25/25 breakdown
-- Cleaner three-metric performance strip
-- Same-player comparison handling and different-player defaults
-- All 11 planned record categories
-- Editable historical seasons
-- Edit Player, profile photo, selectable accent, and Delete Player
-- Compressed profile photos
-- Consistent custom SVG bottom navigation icons
-- Compact header after scrolling
-- Richer Highlights with screenshot, placement, eliminations, damage, other stats, caption
-- Data & Backup section
-- JSON export/import
-- IndexedDB mirror in addition to localStorage
-- USA benchmark remains deliberately unavailable until defensible data exists
-- Service-worker cache bump/cleanup for reliable GitHub Pages refresh
-
-Keep using the fake profile until the test pass is complete.
+V1.1.1 changes:
+- Removed the Home screen "tap for details" instruction.
+- Highlights now open in the CrownBoard sheet UI instead of a browser alert.
+- Existing highlights can be edited.
+- Existing highlights can be deleted.
+- Existing highlight screenshots are preserved unless a replacement is selected.
+- Simplified Data & Backup copy.
+- First weekly update now creates visible trend movement from the baseline.
+- Trend chart shows the first weekly data point instead of remaining blank.
+- Service-worker cache bumped to `crownboard-v1-1-1`.
