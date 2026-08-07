@@ -1,30 +1,15 @@
-# CrownBoard V1.0
+# CrownBoard V1.1
 
-Upload all files in this ZIP to the root of a GitHub repository with GitHub Pages enabled.
+First onboarding revision.
 
-Included:
-- index.html
-- manifest.webmanifest
-- sw.js
-- icon-192.svg
-- icon-512.svg
+Changes from V1.0:
+- Historical completed-season entry is now part of profile creation.
+- Starts with Chapter 7 Season 1, 2, and 3 rows; add/remove seasons as needed.
+- Current season is explicitly stored as a baseline and does not create a weekly period.
+- Completed seasons calculate Crown Score automatically.
+- Profile data history displays historical seasons and qualification status.
+- Season Trend compares the current season against the latest completed season.
+- Added validation for wins > matches.
+- Service worker cache bumped so the updated shell refreshes correctly.
 
-Core V1:
-- Unlimited local profiles
-- Current-season snapshots
-- Crown Score engine
-- Weekly/period scoring
-- Season/lifetime stats
-- Recent Form
-- Trends
-- Family Compare
-- Records / Goals / Highlights
-- Raw snapshot history + editing
-- JSON export/import
-- PWA installability
-
-Known V1 boundaries:
-- USA benchmark framework is present, but no fabricated percentile data.
-- True push reminders are not yet enabled.
-- Cloud sync is not yet enabled.
-- Historical-season onboarding UI is intentionally minimal in this first build.
+Upload these files to the repository root and replace the existing files.
