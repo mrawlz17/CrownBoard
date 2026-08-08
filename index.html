@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.webmanifest">
-<title>CrownBoard V1.2.1</title>
+<title>CrownBoard V1.2.2</title>
 <style>
 :root{
   --bg:#07111f;--card:#0e1b2e;--line:#243550;--text:#f6f8fb;--muted:#99a8bf;
@@ -89,6 +89,25 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
 .appInfoGrid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:8px}.appInfoItem{padding:14px 16px;min-height:76px;background:#0b1728}.appInfoItem:nth-child(odd){border-right:1px solid var(--line)}.appInfoItem:nth-child(-n+2){border-bottom:1px solid var(--line)}.appInfoItem .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.appInfoValue{font-size:18px;font-weight:850;margin-top:5px}.appInfoActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.appInfoFoot{color:var(--muted);font-size:12px;text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .goalGroupTitle{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:850;margin:4px 0 8px}.goalCard{border:1px solid var(--line);background:#0b1728;border-radius:14px;padding:13px}.goalCard b{display:block;margin-bottom:4px}.goalTarget{color:var(--accent);font-weight:850}.goalWhy{color:var(--muted);font-size:12px;margin-top:5px}
 @media(max-width:520px){.statsTabs{gap:6px}.statsTabs .tabBtn{padding:8px 10px;font-size:13px}.appInfoGrid{grid-template-columns:1fr}.appInfoItem:nth-child(odd){border-right:0}.appInfoItem{border-bottom:1px solid var(--line)!important;min-height:auto}.appInfoItem:last-child{border-bottom:0!important}.appInfoActions{grid-template-columns:1fr 1fr}.appInfoActions .btn{padding:11px 8px;font-size:13px}}
+
+.closeIcon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;padding:0;font-size:24px;line-height:1}
+.highlightEditorTop{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:18px;background:#0b1728}
+.highlightEditorTop img{width:132px;height:132px;border-radius:16px;object-fit:cover;background:#081321;border:1px solid var(--line)}
+.highlightEditorMeta{display:grid;gap:8px}.highlightEditorMeta .subtle{line-height:1.35}
+.editorActions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:4px}.editorActions .danger{min-width:150px}
+.calcGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.calcTile{padding:11px 12px;border-radius:14px;border:1px solid var(--line);background:#081524}.calcTile .label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.calcTile b{display:block;margin-top:4px;font-size:18px}
+.historyCard{border:1px solid var(--line);background:#0b1728;border-radius:16px;padding:14px}.historyTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.historyTitle{font-size:18px;font-weight:900}.historyRaw{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:12px}.historyStat{background:#081524;border:1px solid var(--line);border-radius:12px;padding:9px}.historyStat span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em}.historyStat b{display:block;margin-top:3px;font-size:16px}.historyRates{color:var(--muted);font-size:12px;line-height:1.5;margin-top:10px}
+.statCompareControls{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:14px}.vsMini{padding-bottom:13px;color:var(--muted);font-weight:900}.compareSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.compareSummary .calcTile{text-align:center}
+.compactSeason{white-space:nowrap}
+.rawStat .v.stackValue{display:grid;gap:1px}.rawStat .v.stackValue .count{font-size:25px}.rawStat .v.stackValue .rate{font-size:18px;color:var(--muted)}
+@media(max-width:620px){
+ .highlightEditorTop{grid-template-columns:104px 1fr}.highlightEditorTop img{width:104px;height:104px}
+ .calcGrid{grid-template-columns:1fr 1fr}
+ .historyRaw{grid-template-columns:repeat(3,1fr)}
+ .statCompareControls{grid-template-columns:1fr 1fr}.vsMini{display:none}
+ .editorActions{grid-template-columns:1fr}.editorActions .danger{min-width:0}
+}
+
 </style>
 </head>
 <body>
@@ -156,7 +175,18 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
 <section id="records" class="view">
   <div class="sectionHead"><h1>Stats</h1><span class="pill">Zero Build</span></div>
   <div class="tabs statsTabs"><button class="tabBtn active" data-record-tab="fortnite">Fortnite Stats</button><button class="tabBtn" data-record-tab="records">Records</button><button class="tabBtn" data-record-tab="goals">Goals</button><button class="tabBtn" data-record-tab="highlights">Highlights</button></div>
-  <div id="fortnitePane"><div class="card"><div class="sectionHead"><h2 id="rawSeasonTitle">Current Season</h2><span class="pill">Raw Fortnite</span></div><div id="rawCurrent" class="rawStatsGrid"></div></div><div class="section card"><h2>Season-over-Season</h2><div class="tableWrap" id="seasonCompareTable"></div></div></div>
+  <div id="fortnitePane">
+  <div class="card"><div class="sectionHead"><h2 id="rawSeasonTitle">Current Season</h2><span class="pill">Raw Fortnite</span></div><div id="rawCurrent" class="rawStatsGrid"></div></div>
+  <div class="section card">
+    <div class="sectionHead"><h2>Stat Comparison</h2></div>
+    <div class="statCompareControls">
+      <div class="field"><label>Compare</label><select id="statCompareA"></select></div>
+      <div class="vsMini">VS</div>
+      <div class="field"><label>Against</label><select id="statCompareB"></select></div>
+    </div>
+    <div class="tableWrap" id="seasonCompareTable"></div>
+  </div>
+</div>
   <div id="recordsPane" class="card" style="display:none"></div><div id="goalsPane" class="card" style="display:none"></div><div id="highlightsPane" class="card" style="display:none"></div>
 </section>
 
@@ -166,7 +196,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
     <div style="display:flex;align-items:center;gap:14px"><img class="avatar" id="profileAvatar" style="width:72px;height:72px" alt=""><div style="flex:1"><h2 id="profileName">Player</h2><div class="subtle" id="profileMeta"></div></div><button class="btn small" id="editProfileBtn">Edit</button></div>
   </div>
   <div class="section card">
-    <div class="sectionHead"><h2>Data History</h2><span class="pill">Editable</span></div>
+    <div class="sectionHead"><h2>Data History</h2></div>
     <div class="list" id="dataHistory"></div>
   </div>
   <div class="section card">
@@ -201,30 +231,62 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
   <div class="sectionHead"><h2 id="profileModalTitle">Create Player</h2><button class="btn" data-close="profileModal">Close</button></div>
   <div class="formGrid">
     <div style="display:flex;gap:14px;align-items:center"><img id="newPhotoPreview" class="uploadPreview" alt=""><div><button class="btn small" id="choosePhotoBtn" type="button">Choose Photo</button><input id="newPhoto" type="file" accept="image/*" hidden><div class="small subtle" style="margin-top:6px">Compressed automatically.</div></div></div>
-    <div class="field"><label>Name</label><input id="newName"></div><div class="field"><label>Epic display name (optional)</label><input id="newEpic"></div><div class="field"><label>Accent</label><input id="newAccent" type="color" value="#15d8ff"></div><div class="field"><label>First chapter / season played</label><select id="newFirstSeason"><option value="">Select…</option><option>Chapter 1 Season 1</option><option>Chapter 1 Season 2</option><option>Chapter 1 Season 3</option><option>Chapter 1 Season 4</option><option>Chapter 1 Season 5</option><option>Chapter 1 Season 6</option><option>Chapter 1 Season 7</option><option>Chapter 1 Season 8</option><option>Chapter 1 Season 9</option><option>Chapter 1 Season 10</option><option>Chapter 2 Season 1</option><option>Chapter 2 Season 2</option><option>Chapter 2 Season 3</option><option>Chapter 2 Season 4</option><option>Chapter 2 Season 5</option><option>Chapter 2 Season 6</option><option>Chapter 2 Season 7</option><option>Chapter 2 Season 8</option><option>Chapter 2 Season 9</option><option>Chapter 2 Season 10</option><option>Chapter 3 Season 1</option><option>Chapter 3 Season 2</option><option>Chapter 3 Season 3</option><option>Chapter 3 Season 4</option><option>Chapter 3 Season 5</option><option>Chapter 3 Season 6</option><option>Chapter 3 Season 7</option><option>Chapter 3 Season 8</option><option>Chapter 3 Season 9</option><option>Chapter 3 Season 10</option><option>Chapter 4 Season 1</option><option>Chapter 4 Season 2</option><option>Chapter 4 Season 3</option><option>Chapter 4 Season 4</option><option>Chapter 4 Season 5</option><option>Chapter 4 Season 6</option><option>Chapter 4 Season 7</option><option>Chapter 4 Season 8</option><option>Chapter 4 Season 9</option><option>Chapter 4 Season 10</option><option>Chapter 5 Season 1</option><option>Chapter 5 Season 2</option><option>Chapter 5 Season 3</option><option>Chapter 5 Season 4</option><option>Chapter 5 Season 5</option><option>Chapter 5 Season 6</option><option>Chapter 5 Season 7</option><option>Chapter 5 Season 8</option><option>Chapter 5 Season 9</option><option>Chapter 5 Season 10</option><option>Chapter 6 Season 1</option><option>Chapter 6 Season 2</option><option>Chapter 6 Season 3</option><option>Chapter 6 Season 4</option><option>Chapter 6 Season 5</option><option>Chapter 6 Season 6</option><option>Chapter 6 Season 7</option><option>Chapter 6 Season 8</option><option>Chapter 6 Season 9</option><option>Chapter 6 Season 10</option><option>Chapter 7 Season 1</option><option>Chapter 7 Season 2</option><option>Chapter 7 Season 3</option><option>Chapter 7 Season 4</option><option>Chapter 7 Season 5</option><option>Chapter 7 Season 6</option><option>Chapter 7 Season 7</option><option>Chapter 7 Season 8</option><option>Chapter 7 Season 9</option><option>Chapter 7 Season 10</option></select></div>
+    <div class="field"><label>Name</label><input id="newName"></div><div class="field"><label>Epic display name (optional)</label><input id="newEpic"></div><div class="field"><label>Accent</label><input id="newAccent" type="color" value="#15d8ff"></div><div class="field"><label>First chapter / season played</label><select id="newFirstSeason"><option value="">Select…</option><option value="Chapter 1 Season 1">C1S1</option><option value="Chapter 1 Season 2">C1S2</option><option value="Chapter 1 Season 3">C1S3</option><option value="Chapter 1 Season 4">C1S4</option><option value="Chapter 1 Season 5">C1S5</option><option value="Chapter 1 Season 6">C1S6</option><option value="Chapter 1 Season 7">C1S7</option><option value="Chapter 1 Season 8">C1S8</option><option value="Chapter 1 Season 9">C1S9</option><option value="Chapter 1 Season 10">C1S10</option><option value="Chapter 2 Season 1">C2S1</option><option value="Chapter 2 Season 2">C2S2</option><option value="Chapter 2 Season 3">C2S3</option><option value="Chapter 2 Season 4">C2S4</option><option value="Chapter 2 Season 5">C2S5</option><option value="Chapter 2 Season 6">C2S6</option><option value="Chapter 2 Season 7">C2S7</option><option value="Chapter 2 Season 8">C2S8</option><option value="Chapter 2 Season 9">C2S9</option><option value="Chapter 2 Season 10">C2S10</option><option value="Chapter 3 Season 1">C3S1</option><option value="Chapter 3 Season 2">C3S2</option><option value="Chapter 3 Season 3">C3S3</option><option value="Chapter 3 Season 4">C3S4</option><option value="Chapter 3 Season 5">C3S5</option><option value="Chapter 3 Season 6">C3S6</option><option value="Chapter 3 Season 7">C3S7</option><option value="Chapter 3 Season 8">C3S8</option><option value="Chapter 3 Season 9">C3S9</option><option value="Chapter 3 Season 10">C3S10</option><option value="Chapter 4 Season 1">C4S1</option><option value="Chapter 4 Season 2">C4S2</option><option value="Chapter 4 Season 3">C4S3</option><option value="Chapter 4 Season 4">C4S4</option><option value="Chapter 4 Season 5">C4S5</option><option value="Chapter 4 Season 6">C4S6</option><option value="Chapter 4 Season 7">C4S7</option><option value="Chapter 4 Season 8">C4S8</option><option value="Chapter 4 Season 9">C4S9</option><option value="Chapter 4 Season 10">C4S10</option><option value="Chapter 5 Season 1">C5S1</option><option value="Chapter 5 Season 2">C5S2</option><option value="Chapter 5 Season 3">C5S3</option><option value="Chapter 5 Season 4">C5S4</option><option value="Chapter 5 Season 5">C5S5</option><option value="Chapter 5 Season 6">C5S6</option><option value="Chapter 5 Season 7">C5S7</option><option value="Chapter 5 Season 8">C5S8</option><option value="Chapter 5 Season 9">C5S9</option><option value="Chapter 5 Season 10">C5S10</option><option value="Chapter 6 Season 1">C6S1</option><option value="Chapter 6 Season 2">C6S2</option><option value="Chapter 6 Season 3">C6S3</option><option value="Chapter 6 Season 4">C6S4</option><option value="Chapter 6 Season 5">C6S5</option><option value="Chapter 6 Season 6">C6S6</option><option value="Chapter 6 Season 7">C6S7</option><option value="Chapter 6 Season 8">C6S8</option><option value="Chapter 6 Season 9">C6S9</option><option value="Chapter 6 Season 10">C6S10</option><option value="Chapter 7 Season 1">C7S1</option><option value="Chapter 7 Season 2">C7S2</option><option value="Chapter 7 Season 3">C7S3</option><option value="Chapter 7 Season 4">C7S4</option><option value="Chapter 7 Season 5">C7S5</option><option value="Chapter 7 Season 6">C7S6</option><option value="Chapter 7 Season 7">C7S7</option><option value="Chapter 7 Season 8">C7S8</option><option value="Chapter 7 Season 9">C7S9</option><option value="Chapter 7 Season 10">C7S10</option></select></div>
     <div class="card" style="padding:14px"><div class="sectionHead"><div><div class="kicker">CAREER SETUP</div><h3 style="margin:4px 0 0">Completed Seasons</h3></div><button type="button" class="btn small" id="addHistorySeason">+ Season</button></div><div id="historySeasonRows" class="list"></div></div>
-    <div class="card" style="padding:14px"><div class="kicker">CURRENT SEASON BASELINE</div><div class="field" style="margin-top:10px"><label>Current chapter / season</label><select id="newCurrentSeason"><option value="">Select…</option><option>Chapter 1 Season 1</option><option>Chapter 1 Season 2</option><option>Chapter 1 Season 3</option><option>Chapter 1 Season 4</option><option>Chapter 1 Season 5</option><option>Chapter 1 Season 6</option><option>Chapter 1 Season 7</option><option>Chapter 1 Season 8</option><option>Chapter 1 Season 9</option><option>Chapter 1 Season 10</option><option>Chapter 2 Season 1</option><option>Chapter 2 Season 2</option><option>Chapter 2 Season 3</option><option>Chapter 2 Season 4</option><option>Chapter 2 Season 5</option><option>Chapter 2 Season 6</option><option>Chapter 2 Season 7</option><option>Chapter 2 Season 8</option><option>Chapter 2 Season 9</option><option>Chapter 2 Season 10</option><option>Chapter 3 Season 1</option><option>Chapter 3 Season 2</option><option>Chapter 3 Season 3</option><option>Chapter 3 Season 4</option><option>Chapter 3 Season 5</option><option>Chapter 3 Season 6</option><option>Chapter 3 Season 7</option><option>Chapter 3 Season 8</option><option>Chapter 3 Season 9</option><option>Chapter 3 Season 10</option><option>Chapter 4 Season 1</option><option>Chapter 4 Season 2</option><option>Chapter 4 Season 3</option><option>Chapter 4 Season 4</option><option>Chapter 4 Season 5</option><option>Chapter 4 Season 6</option><option>Chapter 4 Season 7</option><option>Chapter 4 Season 8</option><option>Chapter 4 Season 9</option><option>Chapter 4 Season 10</option><option>Chapter 5 Season 1</option><option>Chapter 5 Season 2</option><option>Chapter 5 Season 3</option><option>Chapter 5 Season 4</option><option>Chapter 5 Season 5</option><option>Chapter 5 Season 6</option><option>Chapter 5 Season 7</option><option>Chapter 5 Season 8</option><option>Chapter 5 Season 9</option><option>Chapter 5 Season 10</option><option>Chapter 6 Season 1</option><option>Chapter 6 Season 2</option><option>Chapter 6 Season 3</option><option>Chapter 6 Season 4</option><option>Chapter 6 Season 5</option><option>Chapter 6 Season 6</option><option>Chapter 6 Season 7</option><option>Chapter 6 Season 8</option><option>Chapter 6 Season 9</option><option>Chapter 6 Season 10</option><option>Chapter 7 Season 1</option><option>Chapter 7 Season 2</option><option>Chapter 7 Season 3</option><option>Chapter 7 Season 4</option><option>Chapter 7 Season 5</option><option>Chapter 7 Season 6</option><option>Chapter 7 Season 7</option><option>Chapter 7 Season 8</option><option>Chapter 7 Season 9</option><option>Chapter 7 Season 10</option></select></div><div class="grid3" style="margin-top:10px"><div class="field"><label>Matches</label><input id="newMatches" inputmode="numeric" placeholder="Matches"></div><div class="field"><label>Wins</label><input id="newWins" inputmode="numeric" placeholder="Wins"></div><div class="field"><label>Eliminations</label><input id="newElims" inputmode="numeric" placeholder="Eliminations"></div></div><div class="grid2" style="margin-top:10px"><div class="field"><label>Top 10 finishes</label><input id="newTop10" inputmode="numeric" placeholder="Top 10"></div><div class="field"><label>Top 25 finishes</label><input id="newTop25" inputmode="numeric" placeholder="Top 25"></div></div></div>
+    <div class="card" style="padding:14px"><div class="kicker">CURRENT SEASON BASELINE</div><div class="field" style="margin-top:10px"><label>Current chapter / season</label><select id="newCurrentSeason"><option value="">Select…</option><option value="Chapter 1 Season 1">C1S1</option><option value="Chapter 1 Season 2">C1S2</option><option value="Chapter 1 Season 3">C1S3</option><option value="Chapter 1 Season 4">C1S4</option><option value="Chapter 1 Season 5">C1S5</option><option value="Chapter 1 Season 6">C1S6</option><option value="Chapter 1 Season 7">C1S7</option><option value="Chapter 1 Season 8">C1S8</option><option value="Chapter 1 Season 9">C1S9</option><option value="Chapter 1 Season 10">C1S10</option><option value="Chapter 2 Season 1">C2S1</option><option value="Chapter 2 Season 2">C2S2</option><option value="Chapter 2 Season 3">C2S3</option><option value="Chapter 2 Season 4">C2S4</option><option value="Chapter 2 Season 5">C2S5</option><option value="Chapter 2 Season 6">C2S6</option><option value="Chapter 2 Season 7">C2S7</option><option value="Chapter 2 Season 8">C2S8</option><option value="Chapter 2 Season 9">C2S9</option><option value="Chapter 2 Season 10">C2S10</option><option value="Chapter 3 Season 1">C3S1</option><option value="Chapter 3 Season 2">C3S2</option><option value="Chapter 3 Season 3">C3S3</option><option value="Chapter 3 Season 4">C3S4</option><option value="Chapter 3 Season 5">C3S5</option><option value="Chapter 3 Season 6">C3S6</option><option value="Chapter 3 Season 7">C3S7</option><option value="Chapter 3 Season 8">C3S8</option><option value="Chapter 3 Season 9">C3S9</option><option value="Chapter 3 Season 10">C3S10</option><option value="Chapter 4 Season 1">C4S1</option><option value="Chapter 4 Season 2">C4S2</option><option value="Chapter 4 Season 3">C4S3</option><option value="Chapter 4 Season 4">C4S4</option><option value="Chapter 4 Season 5">C4S5</option><option value="Chapter 4 Season 6">C4S6</option><option value="Chapter 4 Season 7">C4S7</option><option value="Chapter 4 Season 8">C4S8</option><option value="Chapter 4 Season 9">C4S9</option><option value="Chapter 4 Season 10">C4S10</option><option value="Chapter 5 Season 1">C5S1</option><option value="Chapter 5 Season 2">C5S2</option><option value="Chapter 5 Season 3">C5S3</option><option value="Chapter 5 Season 4">C5S4</option><option value="Chapter 5 Season 5">C5S5</option><option value="Chapter 5 Season 6">C5S6</option><option value="Chapter 5 Season 7">C5S7</option><option value="Chapter 5 Season 8">C5S8</option><option value="Chapter 5 Season 9">C5S9</option><option value="Chapter 5 Season 10">C5S10</option><option value="Chapter 6 Season 1">C6S1</option><option value="Chapter 6 Season 2">C6S2</option><option value="Chapter 6 Season 3">C6S3</option><option value="Chapter 6 Season 4">C6S4</option><option value="Chapter 6 Season 5">C6S5</option><option value="Chapter 6 Season 6">C6S6</option><option value="Chapter 6 Season 7">C6S7</option><option value="Chapter 6 Season 8">C6S8</option><option value="Chapter 6 Season 9">C6S9</option><option value="Chapter 6 Season 10">C6S10</option><option value="Chapter 7 Season 1">C7S1</option><option value="Chapter 7 Season 2">C7S2</option><option value="Chapter 7 Season 3">C7S3</option><option value="Chapter 7 Season 4">C7S4</option><option value="Chapter 7 Season 5">C7S5</option><option value="Chapter 7 Season 6">C7S6</option><option value="Chapter 7 Season 7">C7S7</option><option value="Chapter 7 Season 8">C7S8</option><option value="Chapter 7 Season 9">C7S9</option><option value="Chapter 7 Season 10">C7S10</option></select></div><div class="grid3" style="margin-top:10px"><div class="field"><label>Matches</label><input id="newMatches" inputmode="numeric" placeholder="Matches"></div><div class="field"><label>Wins</label><input id="newWins" inputmode="numeric" placeholder="Wins"></div><div class="field"><label>Eliminations</label><input id="newElims" inputmode="numeric" placeholder="Eliminations"></div></div><div class="grid2" style="margin-top:10px"><div class="field"><label>Top 10 finishes</label><input id="newTop10" inputmode="numeric" placeholder="Top 10"></div><div class="field"><label>Top 25 finishes</label><input id="newTop25" inputmode="numeric" placeholder="Top 25"></div></div></div>
     <button class="btn primary" id="saveProfileBtn">SAVE PLAYER</button><button class="btn danger" id="deleteProfileBtn" style="display:none">DELETE PLAYER</button>
   </div>
 </div></div>
 
 <div class="modal" id="highlightModal"><div class="sheet">
-  <div class="sectionHead"><h2 id="highlightModalTitle">Add Highlight</h2><button class="btn" data-close="highlightModal">Close</button></div>
+  <div class="sectionHead"><div><div class="kicker">HIGHLIGHT</div><h2 id="highlightModalTitle" style="margin:3px 0 0">Add Highlight</h2></div><button class="btn closeIcon" data-close="highlightModal" aria-label="Close">×</button></div>
   <div class="formGrid">
-    <div class="field"><label>Screenshot</label><input id="hlImage" type="file" accept="image/*"></div>
+    <div class="highlightEditorTop">
+      <img id="hlPreview" alt="Highlight screenshot preview">
+      <div class="highlightEditorMeta">
+        <button class="btn small" id="hlChooseImageBtn" type="button">Change Photo</button>
+        <input id="hlImage" type="file" accept="image/*" hidden>
+        <div class="subtle small">Your existing screenshot stays unless you replace it.</div>
+      </div>
+    </div>
     <div class="grid2"><div class="field"><label>Date</label><input id="hlDate" type="date"></div><div class="field"><label>Placement</label><input id="hlPlacement" inputmode="numeric" placeholder="Placement"></div></div>
-    <div class="grid2"><div class="field"><label>Eliminations</label><input id="hlElims" inputmode="numeric"></div><div class="field"><label>Damage</label><input id="hlDamage" inputmode="numeric"></div></div>
-    <div class="field"><label>Other visible stats</label><textarea id="hlOther" rows="3" placeholder="Accuracy, headshots, assists, etc."></textarea></div>
+    <div class="grid2"><div class="field"><label>Eliminations</label><input id="hlElims" inputmode="numeric" placeholder="Eliminations"></div><div class="field"><label>Damage</label><input id="hlDamage" inputmode="numeric" placeholder="Damage"></div></div>
+    <div class="field"><label>Other visible stats</label><textarea id="hlOther" rows="2" placeholder="Accuracy, headshots, assists, etc."></textarea></div>
     <div class="field"><label>Caption</label><input id="hlCaption" placeholder="Monster game"></div>
-    <button class="btn primary" id="saveHighlightBtn">SAVE HIGHLIGHT</button>
-    <button class="btn danger" id="deleteHighlightBtn" style="display:none">DELETE HIGHLIGHT</button>
+    <div class="editorActions"><button class="btn primary" id="saveHighlightBtn">SAVE CHANGES</button><button class="btn danger" id="deleteHighlightBtn" style="display:none">DELETE</button></div>
+  </div>
+</div></div>
+
+<div class="modal" id="statEditModal"><div class="sheet">
+  <div class="sectionHead"><div><div class="kicker">DATA HISTORY</div><h2 id="statEditTitle" style="margin:3px 0 0">Edit Stats</h2></div><button class="btn closeIcon" data-close="statEditModal" aria-label="Close">×</button></div>
+  <div class="formGrid">
+    <div class="grid3">
+      <div class="field"><label>Matches</label><input id="editStatMatches" inputmode="numeric"></div>
+      <div class="field"><label>Wins</label><input id="editStatWins" inputmode="numeric"></div>
+      <div class="field"><label>Eliminations</label><input id="editStatElims" inputmode="numeric"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Top 10</label><input id="editStatTop10" inputmode="numeric"></div>
+      <div class="field"><label>Top 25</label><input id="editStatTop25" inputmode="numeric"></div>
+    </div>
+    <div class="card" style="padding:13px">
+      <div class="kicker">CALCULATED</div>
+      <div class="calcGrid" id="statEditCalculated" style="margin-top:9px"></div>
+    </div>
+    <button class="btn primary" id="saveStatEditBtn">SAVE CHANGES</button>
   </div>
 </div></div>
 
 <script>
-const APP_VERSION='1.2.1', DB_KEY='crownboard-v1';
-let db={activeProfileId:null,profiles:[]}, trendMetric='score', editingProfileId=null, editingHighlightIndex=null, pendingPhoto='', pendingHighlightImage='';
+const APP_VERSION='1.2.2', DB_KEY='crownboard-v1';
+let db={activeProfileId:null,profiles:[]}, trendMetric='score', editingProfileId=null, editingHighlightIndex=null, pendingPhoto='', pendingHighlightImage='', editingStatRef=null;
 const $=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n)), fmt1=n=>Number.isFinite(n)?n.toFixed(1):'—';
+function shortSeason(v){
+ const m=String(v||'').match(/Chapter\s*(\d+)\s*Season\s*(\d+)/i);
+ return m?`C${m[1]}S${m[2]}`:(v||'—')
+}
+function seasonOptionLabel(v){return v==='career'?'Career':shortSeason(v)}
+
 
 function save(){localStorage.setItem(DB_KEY,JSON.stringify(db)); idbMirror().catch(()=>{})}
 function load(){try{const x=JSON.parse(localStorage.getItem(DB_KEY)||'null');if(x&&Array.isArray(x.profiles))db=x}catch(e){}db.profiles.forEach(p=>{p.history=p.history||[];p.snapshots=p.snapshots||[];p.history.forEach(h=>{h.top10=+h.top10||0;h.top25=+h.top25||0});p.snapshots.forEach(x=>{x.top10=+x.top10||0;x.top25=+x.top25||0})})}
@@ -261,14 +323,14 @@ function render(){
  const p=profile();if(!p){openProfileModal();return}
  document.documentElement.style.setProperty('--accent',p.accent||'#15d8ff');
  const av=p.photo||avatarData(p.name,p.accent||'#15d8ff');$('headerAvatar').src=av;$('profileAvatar').src=av;$('headerName').textContent=p.name;$('profileName').textContent=p.name;
- $('profileMeta').textContent=[p.epic&&`Epic: ${p.epic}`,p.firstSeason&&`Playing since ${p.firstSeason}`].filter(Boolean).join(' · ');
- $('seasonKicker').textContent='CURRENT SEASON';$('seasonTitle').textContent=p.currentSeason||'Current Season';
+ $('profileMeta').textContent=[p.epic&&`Epic: ${p.epic}`,p.firstSeason&&`Playing since ${shortSeason(p.firstSeason)}`].filter(Boolean).join(' · ');
+ $('seasonKicker').textContent='CURRENT SEASON';$('seasonTitle').textContent=shortSeason(p.currentSeason||'Current Season');
  const ss=seasonStats(p),ls=lifetimeStats(p),rf=recentForm(p),ps=periods(p),last=ps.at(-1),prev=ps.at(-2);
  $('homeScore').textContent=fmt1(ss.score);$('homeTier').textContent=tier(ss.score);$('scoreRing').style.setProperty('--score',ss.score);$('lifetimeScore').textContent=`${fmt1(ls.score)} · ${tier(ls.score)}`;
  $('homeWR').textContent=fmt1(ss.wr)+'%';$('homeEG').textContent=fmt1(ss.eg);$('homeKD').textContent=fmt1(ss.kd);$('recentForm').textContent=rf.label;$('recentFormText').textContent=rf.text;$('trendForm').textContent=rf.label;$('trendNarrative').textContent=rf.text;
  const sd=(id,key,sfx='')=>{if(!last||!prev){$(id).textContent='—';$(id).className='delta';return}const d=last[key]-prev[key];$(id).textContent=`${d>=0?'↑':'↓'} ${fmt1(Math.abs(d))}${sfx}`;$(id).className='delta '+(d>=0?'up':'down')};sd('homeWRDelta','wr',' pts');sd('homeEGDelta','eg');sd('homeKDDelta','kd');
  $('periodMatches').textContent=last?last.matches:'—';$('periodWins').textContent=last?last.wins:'—';$('periodElims').textContent=last?last.elims:'—';$('periodQual').textContent=last?last.qualification:'No data';
- const hist=p.history||[];if(hist.length){const prevS=stats(hist.at(-1)),prevScore=crown(prevS).score,d=ss.score-prevScore,pct=prevScore?d/prevScore*100:0;const movers=[['Win Rate',ss.wr-prevS.wr],['Elims/Game',ss.eg-prevS.eg],['K/D',ss.kd-prevS.kd]].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));$('seasonTrend').textContent=`${d>=0?'+':''}${fmt1(d)} · ${pct>=0?'+':''}${fmt1(pct)}%`;$('seasonTrendText').textContent=`vs ${hist.at(-1).season} · Biggest mover: ${movers[0][0]} ${movers[0][1]>=0?'+':''}${fmt1(movers[0][1])}`}else{$('seasonTrend').textContent='—';$('seasonTrendText').textContent='Add previous-season history to compare.'}
+ const hist=p.history||[];if(hist.length){const prevS=stats(hist.at(-1)),prevScore=crown(prevS).score,d=ss.score-prevScore,pct=prevScore?d/prevScore*100:0;const movers=[['Win Rate',ss.wr-prevS.wr],['Elims/Game',ss.eg-prevS.eg],['K/D',ss.kd-prevS.kd]].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));$('seasonTrend').textContent=`${d>=0?'+':''}${fmt1(d)} · ${pct>=0?'+':''}${fmt1(pct)}%`;$('seasonTrendText').textContent=`vs ${shortSeason(hist.at(-1).season)} · Biggest mover: ${movers[0][0]} ${movers[0][1]>=0?'+':''}${fmt1(movers[0][1])}`}else{$('seasonTrend').textContent='—';$('seasonTrendText').textContent='Add previous-season history to compare.'}
  renderGoals(p);renderTrends(p);renderProfileSelects();renderCompare();renderRecords(p);renderHistory(p);renderScoreBreakdown(p);renderRawStats(p)
 }
 function renderScoreBreakdown(p){const s=seasonStats(p),c=crown(s);$('breakdownScore').textContent=fmt1(c.score);$('breakdownTier').textContent=tier(c.score);const rows=[['Win Rate',`${fmt1(s.wr)}%`,c.components.wr,30],['Top 10 Rate',`${fmt1(s.t10r)}%`,c.components.t10,12.5],['Top 25 Rate',`${fmt1(s.t25r)}%`,c.components.t25,7.5],['Elims / Game',fmt1(s.eg),c.components.eg,25],['K/D',fmt1(s.kd),c.components.kd,25]];$('scoreBreakdownRows').innerHTML=rows.map(([n,v,pts,max])=>`<div class="breakdownRow"><div><b>${n}</b><div class="subtle small">${v}</div><div class="breakdownBar"><i style="width:${pts/max*100}%"></i></div></div><b>${fmt1(pts)} / ${max}</b></div>`).join('')+`<div class="breakdownRow"><b>Total</b><b>${fmt1(c.score)} / 100</b></div>`}
@@ -285,7 +347,7 @@ function suggestedGoals(p){
  ];
  metrics.sort((a,b)=>curve(a.value,a.key==='wr'?[2,5,10,20,35]:a.key==='eg'?[.7,1.6,2.6,4,6]:a.key==='kd'?[1,2,3.5,5,8]:[15,30,45,65,80])-curve(b.value,b.key==='wr'?[2,5,10,20,35]:b.key==='eg'?[.7,1.6,2.6,4,6]:b.key==='kd'?[1,2,3.5,5,8]:[15,30,45,65,80]));
  const a=metrics[0];add(`Improve ${a.label}`,`${a.target}${a.unit}`,a.why);
- if((p.history||[]).length){const prev=stats(p.history.at(-1)),prevScore=crown(prev).score,cur=crown(s).score;add(`Beat ${p.history.at(-1).season}`,`${fmt1(Math.max(cur+.5,prevScore+.5))} Crown Score`,`Finish the season above your previous season's Crown Score.`)}
+ if((p.history||[]).length){const prev=stats(p.history.at(-1)),prevScore=crown(prev).score,cur=crown(s).score;add(`Beat ${shortSeason(p.history.at(-1).season)}`,`${fmt1(Math.max(cur+.5,prevScore+.5))} Crown Score`,`Finish the season above your previous season's Crown Score.`)}
  if(ps.length){const last=ps.at(-1);if(last.matches>=10)add('Strong Next Update',`${fmt1(Math.max(last.score+2,crown(s).score))} Crown Score`,'Beat your latest qualifying period and keep the trend moving up.')}
  return out.slice(0,3)
 }
@@ -340,20 +402,49 @@ function renderRecords(p){const q=periods(p).filter(x=>x.qualification==='Offici
 function editHighlight(i){
  const p=profile(),h=(p.highlights||[])[i];if(!h)return;
  editingHighlightIndex=i;pendingHighlightImage=h.image||'';
- $('highlightModalTitle').textContent='Edit Highlight';
- $('deleteHighlightBtn').style.display='block';
- $('hlDate').value=h.date||'';
- $('hlPlacement').value=h.placement||1;
- $('hlElims').value=h.elims??'';
- $('hlDamage').value=h.damage??'';
- $('hlOther').value=h.other||'';
- $('hlCaption').value=h.caption||'';
- $('hlImage').value='';
- $('highlightModal').classList.add('open')
+ $('highlightModalTitle').textContent='Edit Highlight';$('saveHighlightBtn').textContent='SAVE CHANGES';
+ $('deleteHighlightBtn').style.display='block';$('hlDate').value=h.date||'';$('hlPlacement').value=h.placement??'';$('hlElims').value=h.elims??'';$('hlDamage').value=h.damage??'';$('hlOther').value=h.other||'';$('hlCaption').value=h.caption||'';$('hlImage').value='';
+ $('hlPreview').src=pendingHighlightImage||avatarData('HL',p.accent);$('highlightModal').classList.add('open')
 }
-function renderHistory(p){const seasons=(p.history||[]).map((h,i)=>{const s=stats(h),c=crown(s).score;return `<div class="listItem"><span><b>${h.season}</b><br><span class="small subtle">${h.matches} matches · ${h.wins} wins · ${h.elims} elims · Crown ${fmt1(c)}</span></span><div style="display:grid;gap:6px;justify-items:end"><span class="pill">${qual(h.matches,'season')}</span><button class="btn small" onclick="editHistorical(${i})">Edit</button></div></div>`}).join('');const snaps=(p.snapshots||[]).slice().reverse().map((s,i)=>`<div class="listItem"><span>${s.date}${s.baseline?' · Baseline':''}<br><span class="small subtle">${s.matches} matches · ${s.wins} wins · ${s.elims} elims</span></span><button class="btn small" onclick="editSnapshot(${p.snapshots.length-1-i})">Edit</button></div>`).join('');$('dataHistory').innerHTML=seasons+snaps||'<div class="subtle">No data yet.</div>'}
-function editHistorical(i){const p=profile(),h=p.history[i],m=+prompt(`${h.season} matches`,h.matches),w=+prompt(`${h.season} wins`,h.wins),e=+prompt(`${h.season} eliminations`,h.elims);if([m,w,e].some(Number.isNaN)||m<0||w<0||e<0||w>m)return alert('Check those totals.');const t10=+prompt(`${h.season} Top 10 finishes`,h.top10||0),t25=+prompt(`${h.season} Top 25 finishes`,h.top25||0);if(t10>m||t25>m)return alert('Placements cannot exceed matches.');Object.assign(h,{matches:m,wins:w,elims:e,top10:t10,top25:t25});save();render()}
-function editSnapshot(i){const p=profile(),s=p.snapshots[i],m=+prompt('Matches',s.matches),w=+prompt('Wins',s.wins),e=+prompt('Eliminations',s.elims);if([m,w,e].some(Number.isNaN)||m<0||w<0||e<0||w>m)return alert('Check those totals.');const prev=p.snapshots[i-1],next=p.snapshots[i+1];if(prev&&(m<prev.matches||w<prev.wins||e<prev.elims))return alert('This snapshot cannot be lower than the previous snapshot.');if(next&&(m>next.matches||w>next.wins||e>next.elims))return alert('This snapshot cannot exceed the next snapshot.');const t10=+prompt('Top 10 finishes',s.top10||0),t25=+prompt('Top 25 finishes',s.top25||0);if(t10>m||t25>m)return alert('Placements cannot exceed matches.');Object.assign(s,{matches:m,wins:w,elims:e,top10:t10,top25:t25});save();render()}
+function historyStatsHtml(st){
+ return `<div class="historyRaw">
+  <div class="historyStat"><span>Matches</span><b>${st.matches}</b></div>
+  <div class="historyStat"><span>Wins</span><b>${st.wins}</b></div>
+  <div class="historyStat"><span>Top 10</span><b>${st.top10}</b></div>
+  <div class="historyStat"><span>Top 25</span><b>${st.top25}</b></div>
+  <div class="historyStat"><span>Elims</span><b>${st.elims}</b></div>
+ </div><div class="historyRates">${fmt1(st.wr)}% WR · ${fmt1(st.t10r)}% Top 10 · ${fmt1(st.t25r)}% Top 25 · ${fmt1(st.eg)} E/G · ${fmt1(st.kd)} K/D · ${fmt1(crown(st).score)} Crown</div>`
+}
+function renderHistory(p){
+ const seasons=(p.history||[]).map((h,i)=>{const st=stats(h);return `<div class="historyCard"><div class="historyTop"><div><div class="historyTitle">${shortSeason(h.season)}</div><span class="pill" style="margin-top:6px">${qual(h.matches,'season')}</span></div><button class="btn small" onclick="editHistorical(${i})">Edit</button></div>${historyStatsHtml(st)}</div>`}).join('');
+ const snaps=(p.snapshots||[]).slice().reverse().map((x,ri)=>{const i=p.snapshots.length-1-ri,st=stats(x),ctx=[x.mode,x.note].filter(Boolean).join(' · ');return `<div class="historyCard"><div class="historyTop"><div><div class="historyTitle">${x.date}${x.baseline?' · Baseline':''}</div>${ctx?`<div class="small subtle" style="margin-top:4px">${ctx}</div>`:''}</div><button class="btn small" onclick="editSnapshot(${i})">Edit</button></div>${historyStatsHtml(st)}</div>`}).join('');
+ $('dataHistory').innerHTML=seasons+snaps||'<div class="subtle">No data yet.</div>'
+}
+function fillStatEdit(ref,label,obj){
+ editingStatRef=ref;$('statEditTitle').textContent=`Edit ${label}`;
+ $('editStatMatches').value=obj.matches??'';$('editStatWins').value=obj.wins??'';$('editStatElims').value=obj.elims??'';$('editStatTop10').value=obj.top10??'';$('editStatTop25').value=obj.top25??'';
+ updateStatEditCalculated();$('statEditModal').classList.add('open')
+}
+function updateStatEditCalculated(){
+ const st=stats({matches:+$('editStatMatches').value||0,wins:+$('editStatWins').value||0,elims:+$('editStatElims').value||0,top10:+$('editStatTop10').value||0,top25:+$('editStatTop25').value||0}),cs=crown(st).score;
+ const rows=[['Win Rate',fmt1(st.wr)+'%'],['Top 10',fmt1(st.t10r)+'%'],['Top 25',fmt1(st.t25r)+'%'],['E/G',fmt1(st.eg)],['K/D',fmt1(st.kd)],['Crown',fmt1(cs)]];
+ $('statEditCalculated').innerHTML=rows.map(([a,b])=>`<div class="calcTile"><div class="label">${a}</div><b>${b}</b></div>`).join('')
+}
+function editHistorical(i){const h=profile()?.history?.[i];if(h)fillStatEdit({type:'history',index:i},shortSeason(h.season),h)}
+function editSnapshot(i){const x=profile()?.snapshots?.[i];if(x)fillStatEdit({type:'snapshot',index:i},x.baseline?'Baseline':x.date,x)}
+function saveStatEdit(){
+ const p=profile();if(!p||!editingStatRef)return;
+ const n={matches:+$('editStatMatches').value,wins:+$('editStatWins').value,elims:+$('editStatElims').value,top10:+$('editStatTop10').value,top25:+$('editStatTop25').value};
+ if(Object.values(n).some(Number.isNaN)||Object.values(n).some(v=>v<0)||n.wins>n.matches||n.top10>n.matches||n.top25>n.matches)return alert('Check those totals.');
+ if(editingStatRef.type==='history'){Object.assign(p.history[editingStatRef.index],n)}
+ else{
+  const i=editingStatRef.index,prev=p.snapshots[i-1],next=p.snapshots[i+1];
+  if(prev&&(n.matches<prev.matches||n.wins<prev.wins||n.elims<prev.elims||n.top10<(+prev.top10||0)||n.top25<(+prev.top25||0)))return alert('This snapshot cannot be lower than the previous snapshot.');
+  if(next&&(n.matches>next.matches||n.wins>next.wins||n.elims>next.elims||n.top10>(+next.top10||0)||n.top25>(+next.top25||0)))return alert('This snapshot cannot exceed the next snapshot.');
+  Object.assign(p.snapshots[i],n)
+ }
+ save();$('statEditModal').classList.remove('open');editingStatRef=null;render()
+}
 function openUpdate(){['updMatches','updWins','updElims','updTop10','updTop25','updNote'].forEach(id=>$(id).value='');$('updMode').value='Mixed';$('updateModal').classList.add('open')}
 function saveUpdate(){const p=profile(),l=(p.snapshots||[]).at(-1)||{matches:0,wins:0,elims:0,top10:0,top25:0},n={date:new Date().toISOString().slice(0,10),matches:+$('updMatches').value,wins:+$('updWins').value,elims:+$('updElims').value,top10:+$('updTop10').value,top25:+$('updTop25').value,mode:$('updMode').value,note:$('updNote').value.trim()};if(n.wins>n.matches||n.top10>n.matches||n.top25>n.matches||n.matches<l.matches||n.wins<l.wins||n.elims<l.elims||n.top10<(+l.top10||0)||n.top25<(+l.top25||0)){alert('Cumulative season totals are invalid or decreased.');return}p.snapshots.push(n);save();$('updateModal').classList.remove('open');render()}
 function historyRow(v={season:'',matches:'',wins:'',elims:'',top10:'',top25:''}){const d=document.createElement('div');d.className='card historySeasonRow';d.style.padding='12px';const val=x=>x===0||x?x:'';d.innerHTML=`<div class="field"><label>Season</label><select class="hsSeason"><option value="">Select…</option>${$('newCurrentSeason').innerHTML.replace('<option value="">Select…</option>','')}</select></div><div class="grid3" style="margin-top:8px"><div class="field"><label>Matches</label><input class="hsMatches" inputmode="numeric" placeholder="Matches" value="${val(v.matches)}"></div><div class="field"><label>Wins</label><input class="hsWins" inputmode="numeric" placeholder="Wins" value="${val(v.wins)}"></div><div class="field"><label>Eliminations</label><input class="hsElims" inputmode="numeric" placeholder="Eliminations" value="${val(v.elims)}"></div></div><div class="grid2" style="margin-top:8px"><div class="field"><label>Top 10</label><input class="hsTop10" inputmode="numeric" placeholder="Top 10" value="${val(v.top10)}"></div><div class="field"><label>Top 25</label><input class="hsTop25" inputmode="numeric" placeholder="Top 25" value="${val(v.top25)}"></div></div><button type="button" class="btn small removeHistory" style="margin-top:8px">Remove</button>`;d.querySelector('.hsSeason').value=v.season||'';d.querySelector('.removeHistory').onclick=()=>d.remove();$('historySeasonRows').appendChild(d)}
@@ -364,10 +455,9 @@ function saveProfile(){const n=$('newName').value.trim(),first=$('newFirstSeason
 function deleteProfile(){const p=profile();if(!p)return;if(!confirm(`Delete ${p.name} and all of this player's CrownBoard data?`))return;db.profiles=db.profiles.filter(x=>x.id!==p.id);db.activeProfileId=db.profiles[0]?.id||null;save();$('profileModal').classList.remove('open');render()}
 function openHighlightModal(){
  editingHighlightIndex=null;pendingHighlightImage='';
- $('highlightModalTitle').textContent='Add Highlight';
- $('deleteHighlightBtn').style.display='none';
+ $('highlightModalTitle').textContent='Add Highlight';$('saveHighlightBtn').textContent='SAVE HIGHLIGHT';$('deleteHighlightBtn').style.display='none';
  $('hlDate').value=new Date().toISOString().slice(0,10);$('hlPlacement').value='';$('hlElims').value='';$('hlDamage').value='';$('hlOther').value='';$('hlCaption').value='';$('hlImage').value='';
- $('highlightModal').classList.add('open')
+ $('hlPreview').src=avatarData('HL',profile()?.accent||'#15d8ff');$('highlightModal').classList.add('open')
 }
 async function saveHighlight(){
  const p=profile(),f=$('hlImage').files[0],image=f?await compressImage(f,1100,.72):pendingHighlightImage;
@@ -382,7 +472,32 @@ function deleteHighlight(){
  p.highlights.splice(editingHighlightIndex,1);save();$('highlightModal').classList.remove('open');editingHighlightIndex=null;pendingHighlightImage='';render()
 }
 
-function renderRawStats(p){const ss=seasonStats(p);$('rawSeasonTitle').textContent=p.currentSeason||'Current Season';const items=[['Matches',ss.matches],['Wins',ss.wins],['Win Rate',fmt1(ss.wr)+'%'],['Top 10',`${ss.top10} · ${fmt1(ss.t10r)}%`],['Top 25',`${ss.top25} · ${fmt1(ss.t25r)}%`],['Eliminations',ss.elims],['Elims / Game',fmt1(ss.eg)],['K/D',fmt1(ss.kd)]];$('rawCurrent').innerHTML=items.map(([k,v])=>`<div class="rawStat"><div class="label subtle small">${k}</div><div class="v">${v}</div></div>`).join('');const h=(p.history||[]);if(!h.length){$('seasonCompareTable').innerHTML='<div class="subtle">Add a completed season to compare.</div>';return}const a={name:h.at(-1).season,s:stats(h.at(-1))},b={name:p.currentSeason,s:ss},rows=[['Win Rate','wr','%'],['Top 10','t10r','%'],['Top 25','t25r','%'],['E/G','eg',''],['K/D','kd','']];$('seasonCompareTable').innerHTML=`<table class="seasonTable"><thead><tr><th>Metric</th><th>${a.name}</th><th>${b.name}</th><th>Change</th></tr></thead><tbody>${rows.map(([n,k,sfx])=>{const d=b.s[k]-a.s[k];return`<tr><td>${n}</td><td>${fmt1(a.s[k])}${sfx}</td><td>${fmt1(b.s[k])}${sfx}</td><td class="${d>0?'positive':d<0?'negative':''}">${d>=0?'+':''}${fmt1(d)}${sfx}</td></tr>`}).join('')}</tbody></table>`}
+function comparisonSources(p){
+ const out=[{id:'career',label:'Career',stats:lifetimeStats(p)}];
+ (p.history||[]).forEach((h,i)=>out.push({id:`h:${i}`,label:shortSeason(h.season),stats:{...stats(h),...crown(stats(h))}}));
+ out.push({id:'current',label:shortSeason(p.currentSeason||'Current'),stats:seasonStats(p)});
+ return out
+}
+function renderStatComparison(p){
+ const src=comparisonSources(p),A=$('statCompareA'),B=$('statCompareB'),oldA=A.value,oldB=B.value;
+ A.innerHTML=B.innerHTML=src.map(x=>`<option value="${x.id}">${x.label}</option>`).join('');
+ const defaultA=src.length>2?src[src.length-2].id:'career',defaultB='current';
+ A.value=src.some(x=>x.id===oldA)?oldA:defaultA;B.value=src.some(x=>x.id===oldB)?oldB:defaultB;
+ if(A.value===B.value&&src.length>1)A.value=src.find(x=>x.id!==B.value)?.id||A.value;
+ const a=src.find(x=>x.id===A.value),b=src.find(x=>x.id===B.value);if(!a||!b)return;
+ const rows=[
+  ['Matches','matches',''],['Wins','wins',''],['Win Rate','wr','%'],['Top 10','top10',''],['Top 10 Rate','t10r','%'],['Top 25','top25',''],['Top 25 Rate','t25r','%'],['Eliminations','elims',''],['E/G','eg',''],['K/D','kd',''],['Crown Score','score','']
+ ];
+ const integerKeys=new Set(['matches','wins','top10','top25','elims']);
+ const fmt=(k,v,sfx)=>integerKeys.has(k)?`${Math.round(v)}${sfx}`:`${fmt1(v)}${sfx}`;
+ $('seasonCompareTable').innerHTML=`<table class="seasonTable"><thead><tr><th>Metric</th><th>${a.label}</th><th>${b.label}</th><th>Change</th></tr></thead><tbody>${rows.map(([n,k,sfx])=>{const av=a.stats[k]??0,bv=b.stats[k]??0,d=bv-av;return`<tr><td>${n}</td><td>${fmt(k,av,sfx)}</td><td>${fmt(k,bv,sfx)}</td><td class="${d>0?'positive':d<0?'negative':''}">${d>=0?'+':''}${fmt(k,d,sfx)}</td></tr>`}).join('')}</tbody></table>`
+}
+function renderRawStats(p){
+ const ss=seasonStats(p);$('rawSeasonTitle').textContent=shortSeason(p.currentSeason||'Current Season');
+ const items=[['Matches',ss.matches,'simple'],['Wins',ss.wins,'simple'],['Win Rate',fmt1(ss.wr)+'%','simple'],['Top 10',{count:ss.top10,rate:fmt1(ss.t10r)+'%'},'stack'],['Top 25',{count:ss.top25,rate:fmt1(ss.t25r)+'%'},'stack'],['Eliminations',ss.elims,'simple'],['Elims / Game',fmt1(ss.eg),'simple'],['K/D',fmt1(ss.kd),'simple']];
+ $('rawCurrent').innerHTML=items.map(([k,v,mode])=>`<div class="rawStat"><div class="label subtle small">${k}</div>${mode==='stack'?`<div class="v stackValue"><span class="count">${v.count}</span><span class="rate">${v.rate}</span></div>`:`<div class="v">${v}</div>`}</div>`).join('');
+ renderStatComparison(p)
+}
 function exportJson(){const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='CrownBoard-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function importJsonFile(f){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.profiles))throw 0;if(!confirm('Replace local CrownBoard data with this backup?'))return;db=x;save();render()}catch(e){alert('Invalid CrownBoard backup')}};r.readAsText(f)}
 
@@ -402,8 +517,8 @@ $('addProfileBtn').onclick=()=>openProfileModal(false);$('editProfileBtn').oncli
 $('choosePhotoBtn').onclick=()=>$('newPhoto').click();$('newPhoto').onchange=async e=>{if(e.target.files[0]){pendingPhoto=await compressImage(e.target.files[0],360,.78);$('newPhotoPreview').src=pendingPhoto}};
 $('newAccent').oninput=e=>{if(!pendingPhoto)$('newPhotoPreview').src=avatarData($('newName').value||'NEW',e.target.value)};
 $('newName').oninput=e=>{if(!pendingPhoto)$('newPhotoPreview').src=avatarData(e.target.value||'NEW',$('newAccent').value)};
-$('saveHighlightBtn').onclick=saveHighlight;$('deleteHighlightBtn').onclick=deleteHighlight;$('exportBtn').onclick=exportJson;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>e.target.files[0]&&importJsonFile(e.target.files[0]);$('checkUpdateBtn').onclick=checkForUpdate;$('forceRefreshBtn').onclick=forceRefresh;
-$('compareA').onchange=()=>{renderProfileSelects();renderCompare()};$('compareB').onchange=()=>{renderProfileSelects();renderCompare()};
+$('hlChooseImageBtn').onclick=()=>$('hlImage').click();$('hlImage').onchange=async e=>{if(e.target.files[0]){pendingHighlightImage=await compressImage(e.target.files[0],1100,.72);$('hlPreview').src=pendingHighlightImage}};$('saveHighlightBtn').onclick=saveHighlight;$('deleteHighlightBtn').onclick=deleteHighlight;$('saveStatEditBtn').onclick=saveStatEdit;['editStatMatches','editStatWins','editStatElims','editStatTop10','editStatTop25'].forEach(id=>$(id).oninput=updateStatEditCalculated);$('exportBtn').onclick=exportJson;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>e.target.files[0]&&importJsonFile(e.target.files[0]);$('checkUpdateBtn').onclick=checkForUpdate;$('forceRefreshBtn').onclick=forceRefresh;
+$('compareA').onchange=()=>{renderProfileSelects();renderCompare()};$('compareB').onchange=()=>{renderProfileSelects();renderCompare()};$('statCompareA').onchange=()=>renderStatComparison(profile());$('statCompareB').onchange=()=>renderStatComparison(profile());
 $('profileSwitch').onclick=()=>{if(db.profiles.length<2)return;const i=db.profiles.findIndex(p=>p.id===db.activeProfileId),n=db.profiles[(i+1)%db.profiles.length];db.activeProfileId=n.id;save();render()};
 window.addEventListener('scroll',()=>{$('appHeader').classList.toggle('compact',window.scrollY>70)},{passive:true});
 load();updateInfo();checkForUpdate();render();
