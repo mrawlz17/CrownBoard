@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.webmanifest">
-<title>CrownBoard V1.2</title>
+<title>CrownBoard V1.2.1</title>
 <style>
 :root{
   --bg:#07111f;--card:#0e1b2e;--line:#243550;--text:#f6f8fb;--muted:#99a8bf;
@@ -84,6 +84,11 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
 
 .rawStatsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.rawStat{border:1px solid var(--line);background:#0b1728;border-radius:14px;padding:12px}.rawStat .v{font-size:25px;font-weight:900;margin-top:5px}.seasonTable{width:100%;border-collapse:collapse;min-width:560px}.seasonTable th,.seasonTable td{padding:10px;border-bottom:1px solid var(--line);text-align:right}.seasonTable th:first-child,.seasonTable td:first-child{text-align:left}.tableWrap{overflow:auto}.contextLine{font-size:12px;color:var(--muted);margin-top:5px}.positive{color:var(--good)}.negative{color:var(--bad)}
 @media(max-width:720px){.rawStatsGrid{grid-template-columns:1fr 1fr}}
+
+.statsTabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.statsTabs::-webkit-scrollbar{display:none}.statsTabs .tabBtn{flex:0 0 auto;white-space:nowrap}
+.appInfoGrid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:8px}.appInfoItem{padding:14px 16px;min-height:76px;background:#0b1728}.appInfoItem:nth-child(odd){border-right:1px solid var(--line)}.appInfoItem:nth-child(-n+2){border-bottom:1px solid var(--line)}.appInfoItem .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.appInfoValue{font-size:18px;font-weight:850;margin-top:5px}.appInfoActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.appInfoFoot{color:var(--muted);font-size:12px;text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.goalGroupTitle{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:850;margin:4px 0 8px}.goalCard{border:1px solid var(--line);background:#0b1728;border-radius:14px;padding:13px}.goalCard b{display:block;margin-bottom:4px}.goalTarget{color:var(--accent);font-weight:850}.goalWhy{color:var(--muted);font-size:12px;margin-top:5px}
+@media(max-width:520px){.statsTabs{gap:6px}.statsTabs .tabBtn{padding:8px 10px;font-size:13px}.appInfoGrid{grid-template-columns:1fr}.appInfoItem:nth-child(odd){border-right:0}.appInfoItem{border-bottom:1px solid var(--line)!important;min-height:auto}.appInfoItem:last-child{border-bottom:0!important}.appInfoActions{grid-template-columns:1fr 1fr}.appInfoActions .btn{padding:11px 8px;font-size:13px}}
 </style>
 </head>
 <body>
@@ -145,12 +150,12 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
     <div class="grid2"><div class="field"><label>Player A</label><select id="compareA"></select></div><div class="field"><label>Player B</label><select id="compareB"></select></div></div>
     <div class="section card" id="compareCard"></div>
   </div>
-  <div id="usaCompare" style="display:none"><div class="card"><div class="kicker">USA ZERO BUILD</div><h2>Benchmark data not published yet</h2><p class="subtle">Crown Score stays absolute. U.S. percentile and elite-reference comparisons will only appear when CrownBoard has defensible benchmark data.</p></div></div>
+  <div id="usaCompare" style="display:none"><div class="card"><div class="kicker">USA ZERO BUILD</div><h2>Coming Soon</h2></div></div>
 </section>
 
 <section id="records" class="view">
   <div class="sectionHead"><h1>Stats</h1><span class="pill">Zero Build</span></div>
-  <div class="tabs"><button class="tabBtn active" data-record-tab="fortnite">Fortnite Stats</button><button class="tabBtn" data-record-tab="records">Records</button><button class="tabBtn" data-record-tab="goals">Goals</button><button class="tabBtn" data-record-tab="highlights">Highlights</button></div>
+  <div class="tabs statsTabs"><button class="tabBtn active" data-record-tab="fortnite">Fortnite Stats</button><button class="tabBtn" data-record-tab="records">Records</button><button class="tabBtn" data-record-tab="goals">Goals</button><button class="tabBtn" data-record-tab="highlights">Highlights</button></div>
   <div id="fortnitePane"><div class="card"><div class="sectionHead"><h2 id="rawSeasonTitle">Current Season</h2><span class="pill">Raw Fortnite</span></div><div id="rawCurrent" class="rawStatsGrid"></div></div><div class="section card"><h2>Season-over-Season</h2><div class="tableWrap" id="seasonCompareTable"></div></div></div>
   <div id="recordsPane" class="card" style="display:none"></div><div id="goalsPane" class="card" style="display:none"></div><div id="highlightsPane" class="card" style="display:none"></div>
 </section>
@@ -167,7 +172,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
   <div class="section card">
     <div class="sectionHead"><h2>Data & Backup</h2></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
-  </div><div class="section card"><div class="sectionHead"><h2>App Info</h2><span class="pill" id="appUpdatePill">Checking…</span></div><div class="appInfoGrid"><div class="appInfoItem"><div class="label">Installed Version</div><div class="appInfoValue" id="installedVersion">—</div></div><div class="appInfoItem"><div class="label">Latest Version</div><div class="appInfoValue" id="latestVersion">—</div></div><div class="appInfoItem"><div class="label">Last App Update</div><div class="appInfoValue" id="lastAppUpdate">—</div></div><div class="appInfoItem"><div class="label">Status</div><div class="appInfoValue" id="appUpdateStatus">—</div></div></div><div class="appInfoActions"><button class="btn" id="checkUpdateBtn">Check for Update</button><button class="btn primary" id="forceRefreshBtn">Force Refresh</button></div><div class="appInfoFoot">CrownBoard · Zero Build Performance Tracker</div></div>
+  </div><div class="section card appInfoCard"><div class="sectionHead"><h2>App Info</h2><span class="pill" id="appUpdatePill">Checking…</span></div><div class="appInfoGrid"><div class="appInfoItem"><div class="label">Installed Version</div><div class="appInfoValue" id="installedVersion">—</div></div><div class="appInfoItem"><div class="label">Latest Version</div><div class="appInfoValue" id="latestVersion">—</div></div><div class="appInfoItem"><div class="label">Last App Update</div><div class="appInfoValue" id="lastAppUpdate">—</div></div><div class="appInfoItem"><div class="label">Status</div><div class="appInfoValue" id="appUpdateStatus">—</div></div></div><div class="appInfoActions"><button class="btn" id="checkUpdateBtn">Check for Update</button><button class="btn primary" id="forceRefreshBtn">Force Refresh</button></div><div class="appInfoFoot">CrownBoard · Zero Build Performance Tracker</div></div>
 </section>
 </main>
 </div>
@@ -217,7 +222,7 @@ padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:9}
 </div></div>
 
 <script>
-const APP_VERSION='1.2', DB_KEY='crownboard-v1';
+const APP_VERSION='1.2.1', DB_KEY='crownboard-v1';
 let db={activeProfileId:null,profiles:[]}, trendMetric='score', editingProfileId=null, editingHighlightIndex=null, pendingPhoto='', pendingHighlightImage='';
 const $=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n)), fmt1=n=>Number.isFinite(n)?n.toFixed(1):'—';
 
@@ -267,7 +272,28 @@ function render(){
  renderGoals(p);renderTrends(p);renderProfileSelects();renderCompare();renderRecords(p);renderHistory(p);renderScoreBreakdown(p);renderRawStats(p)
 }
 function renderScoreBreakdown(p){const s=seasonStats(p),c=crown(s);$('breakdownScore').textContent=fmt1(c.score);$('breakdownTier').textContent=tier(c.score);const rows=[['Win Rate',`${fmt1(s.wr)}%`,c.components.wr,30],['Top 10 Rate',`${fmt1(s.t10r)}%`,c.components.t10,12.5],['Top 25 Rate',`${fmt1(s.t25r)}%`,c.components.t25,7.5],['Elims / Game',fmt1(s.eg),c.components.eg,25],['K/D',fmt1(s.kd),c.components.kd,25]];$('scoreBreakdownRows').innerHTML=rows.map(([n,v,pts,max])=>`<div class="breakdownRow"><div><b>${n}</b><div class="subtle small">${v}</div><div class="breakdownBar"><i style="width:${pts/max*100}%"></i></div></div><b>${fmt1(pts)} / ${max}</b></div>`).join('')+`<div class="breakdownRow"><b>Total</b><b>${fmt1(c.score)} / 100</b></div>`}
-function renderGoals(p){const g=p.goals||[];$('homeGoals').innerHTML=g.slice(0,3).map(x=>`<div class="listItem"><span>${x.label}</span><b>${x.target}</b></div>`).join('')||'<div class="subtle">No goals yet.</div>';$('goalsPane').innerHTML=`<div class="sectionHead"><h2>Goals</h2><button class="btn small" onclick="addGoal()">+ Goal</button></div>`+(g.map(x=>`<div class="record"><span>${x.label}</span><b>${x.target}</b></div>`).join('')||'<div class="subtle">Create your first goal.</div>')}
+function suggestedGoals(p){
+ const s=seasonStats(p),ps=periods(p),out=[];
+ if(!s.matches)return out;
+ const add=(label,target,why)=>out.push({label,target,why});
+ // Prioritize the player's weakest meaningful performance areas.
+ const metrics=[
+  {key:'wr',label:'Win Rate',value:s.wr,target:Math.max(Math.ceil(s.wr+1),Math.ceil(s.wr*1.08)),unit:'%',why:'Push your current win rate up without sacrificing consistency.'},
+  {key:'eg',label:'Elims / Game',value:s.eg,target:Math.ceil((s.eg+.2)*10)/10,unit:'',why:'Raise your elimination pace over the next updates.'},
+  {key:'kd',label:'K/D',value:s.kd,target:Math.ceil((s.kd+.2)*10)/10,unit:'',why:'Improve survival efficiency while keeping pressure on fights.'},
+  {key:'t10r',label:'Top 10 Rate',value:s.t10r,target:Math.ceil(s.t10r+3),unit:'%',why:'Convert more matches into late-game opportunities.'}
+ ];
+ metrics.sort((a,b)=>curve(a.value,a.key==='wr'?[2,5,10,20,35]:a.key==='eg'?[.7,1.6,2.6,4,6]:a.key==='kd'?[1,2,3.5,5,8]:[15,30,45,65,80])-curve(b.value,b.key==='wr'?[2,5,10,20,35]:b.key==='eg'?[.7,1.6,2.6,4,6]:b.key==='kd'?[1,2,3.5,5,8]:[15,30,45,65,80]));
+ const a=metrics[0];add(`Improve ${a.label}`,`${a.target}${a.unit}`,a.why);
+ if((p.history||[]).length){const prev=stats(p.history.at(-1)),prevScore=crown(prev).score,cur=crown(s).score;add(`Beat ${p.history.at(-1).season}`,`${fmt1(Math.max(cur+.5,prevScore+.5))} Crown Score`,`Finish the season above your previous season's Crown Score.`)}
+ if(ps.length){const last=ps.at(-1);if(last.matches>=10)add('Strong Next Update',`${fmt1(Math.max(last.score+2,crown(s).score))} Crown Score`,'Beat your latest qualifying period and keep the trend moving up.')}
+ return out.slice(0,3)
+}
+function renderGoals(p){
+ const g=p.goals||[],sg=suggestedGoals(p);
+ $('homeGoals').innerHTML=sg.slice(0,2).map(x=>`<div class="goalCard"><b>${x.label}</b><span class="goalTarget">${x.target}</span></div>`).join('')||'<div class="subtle">Add stats to unlock suggested goals.</div>';
+ $('goalsPane').innerHTML=`<div class="sectionHead"><h2>Goals</h2><button class="btn small" onclick="addGoal()">+ Goal</button></div><div class="goalGroupTitle">Suggested Goals</div><div class="list">${sg.length?sg.map(x=>`<div class="goalCard"><b>${x.label}</b><span class="goalTarget">${x.target}</span><div class="goalWhy">${x.why}</div></div>`).join(''):'<div class="subtle">Add more stats to unlock suggestions.</div>'}</div><div class="goalGroupTitle" style="margin-top:18px">My Goals</div><div class="list">${g.length?g.map(x=>`<div class="record"><span>${x.label}</span><b>${x.target}</b></div>`).join(''):'<div class="subtle">No personal goals yet.</div>'}</div>`
+}
 function addGoal(){const p=profile(),l=prompt('Goal name');if(!l)return;const t=prompt('Target');(p.goals||(p.goals=[])).push({label:l,target:t});save();render()}
 function renderTrends(p){
  const m=[['score','Crown Score'],['wr','Win Rate'],['t10r','Top 10'],['t25r','Top 25'],['eg','E/G'],['kd','K/D'],['wins','Wins'],['elims','Eliminations']];
